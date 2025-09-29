@@ -18,9 +18,8 @@ class AgentController {
         $agent_id = $_SESSION['user_id'];
         
         // Get assigned tickets
-        $query = "SELECT t.id, t.title, t.status, t.created_at, u.username as user_name FROM tickets t LEFT JOIN users u ON t.user_id = u.id WHERE t.assignee_id = ? ORDER BY t.created_at DESC";
-        $stmt = $this->model->db->prepare($query); // Access db from model, but since private, use getDBConnection
         $db = getDBConnection();
+        $query = "SELECT t.id, t.title, t.status, t.created_at, u.username as user_name FROM tickets t LEFT JOIN users u ON t.user_id = u.id WHERE t.assignee_id = ? ORDER BY t.created_at DESC";
         $stmt = $db->prepare($query);
         $stmt->bind_param("i", $agent_id);
         $stmt->execute();

@@ -5,25 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Administrador - Sistema de Tickets</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #FFFFFF; color: #333; margin: 0; padding: 20px; }
-        .header { background: #007BFF; color: #FFFFFF; padding: 15px; border-radius: 4px 4px 0 0; margin-bottom: 20px; }
-        .header h1 { margin: 0; }
-        .nav { margin-bottom: 20px; }
-        .nav a { background: #007BFF; color: #FFFFFF; padding: 10px 15px; text-decoration: none; border-radius: 4px; margin-right: 10px; }
-        .nav a:hover { background: #0056b3; }
-        .logout { float: right; background: #6C757D; }
-        .logout:hover { background: #545B62; }
-        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .metric-card { background: #FFFFFF; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; }
-        .metric-value { font-size: 2em; color: #007BFF; font-weight: bold; }
-        .metric-label { color: #6C757D; }
-        .report-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .report-table th, .report-table td { padding: 12px; text-align: left; border-bottom: 1px solid #DDD; }
-        .report-table th { background: #F8F9FA; color: #495057; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #F8F9FA; color: #333; margin: 0; padding: 0; }
+        .header { background: linear-gradient(135deg, #007BFF, #0056b3); color: #FFFFFF; padding: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,123,255,0.2); }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .icon { width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .header h1 { margin: 0; font-size: 28px; }
+        .header-right { display: flex; gap: 10px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 25px; cursor: pointer; text-decoration: none; font-weight: bold; transition: all 0.3s; display: inline-block; }
+        .btn-primary { background: #FFFFFF; color: #007BFF; }
+        .btn-primary:hover { background: #E9ECEF; transform: translateY(-2px); }
+        .btn-danger { background: #DC3545; color: #FFFFFF; }
+        .btn-danger:hover { background: #C82333; transform: translateY(-2px); }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .metric-card { background: #FFFFFF; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; transition: transform 0.3s; }
+        .metric-card:hover { transform: translateY(-5px); }
+        .metric-icon { font-size: 40px; color: #007BFF; margin-bottom: 10px; }
+        .metric-value { font-size: 2.5em; color: #007BFF; font-weight: bold; margin-bottom: 5px; }
+        .metric-label { color: #6C757D; font-size: 16px; }
+        .section { background: #FFFFFF; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .section h3 { color: #007BFF; border-bottom: 3px solid #007BFF; padding-bottom: 10px; margin-bottom: 20px; font-size: 24px; }
+        .report-table { width: 100%; border-collapse: collapse; margin-top: 20px; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .report-table th { background: linear-gradient(135deg, #007BFF, #0056b3); color: #FFFFFF; }
+        .report-table td { background: #FFFFFF; }
         .report-table tr:hover { background: #F8F9FA; }
-        .section { margin-bottom: 30px; }
-        .section h3 { color: #007BFF; border-bottom: 2px solid #007BFF; padding-bottom: 5px; }
-        canvas { max-width: 100%; height: 300px; }
+        canvas { max-width: 100%; height: 300px; border-radius: 10px; }
     </style>
     <script>
         // Simple bar chart using canvas for tickets by status (basic for PHP 5.5, no libs)
@@ -49,91 +55,100 @@
 </head>
 <body>
     <div class="header">
-        <h1>Panel de Administrador</h1>
-        <a href="?controller=admin&action=dashboard">Reportes</a>
-        <a href="?controller=admin&action=manageCategories">Gestionar Categorías</a>
-        <a href="?controller=user&action=logout" class="logout">Cerrar Sesión</a>
-    </div>
-    
-    <div class="metrics">
-        <div class="metric-card">
-            <div class="metric-value"><?php echo $avgResolutionTime; ?> días</div>
-            <div class="metric-label">Tiempo Promedio de Resolución</div>
+        <div class="header-left">
+            <div class="icon">👤</div>
+            <h1>Bienvenido, <?php echo htmlspecialchars($_SESSION['username']); ?></h1>
         </div>
-        <div class="metric-card">
-            <div class="metric-value"><?php echo array_sum(array_column($ticketsByStatus, 'count')); ?></div>
-            <div class="metric-label">Total de Tickets</div>
+        <div class="header-right">
+            <a href="?controller=admin&action=dashboard" class="btn btn-primary">Reportes</a>
+            <a href="?controller=admin&action=manageCategories" class="btn btn-primary">Gestionar Categorías</a>
+            <a href="?controller=user&action=logout" class="btn btn-danger">Cerrar Sesión</a>
         </div>
     </div>
     
-    <div class="section">
-        <h3>Tiempos de Resolución Promedio</h3>
-        <p>El tiempo promedio de resolución para tickets resueltos es de <?php echo $avgResolutionTime; ?> días.</p>
-    </div>
-    
-    <div class="section">
-        <h3>Tickets por Categoría</h3>
-        <table class="report-table">
-            <thead>
-                <tr>
-                    <th>Categoría</th>
-                    <th>Cantidad</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($ticketsPerCategory as $item): ?>
+    <div class="container">
+        <div class="metrics">
+            <div class="metric-card">
+                <div class="metric-icon">⏱️</div>
+                <div class="metric-value"><?php echo $avgResolutionTime; ?> días</div>
+                <div class="metric-label">Tiempo Promedio de Resolución</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">📊</div>
+                <div class="metric-value"><?php echo array_sum(array_column($ticketsByStatus, 'count')); ?></div>
+                <div class="metric-label">Total de Tickets</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Tiempos de Resolución Promedio</h3>
+            <p>El tiempo promedio de resolución para tickets resueltos es de <?php echo $avgResolutionTime; ?> días.</p>
+        </div>
+        
+        <div class="section">
+            <h3>Tickets por Categoría</h3>
+            <table class="report-table">
+                <thead>
                     <tr>
-                        <td><?php echo htmlspecialchars($item['category']); ?></td>
-                        <td><?php echo $item['count']; ?></td>
+                        <th>Categoría</th>
+                        <th>Cantidad</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-    
-    <div class="section">
-        <h3>Tickets por Agente</h3>
-        <table class="report-table">
-            <thead>
-                <tr>
-                    <th>Agente</th>
-                    <th>Cantidad</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($ticketsPerAgent as $item): ?>
+                </thead>
+                <tbody>
+                    <?php foreach ($ticketsPerCategory as $item): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($item['category']); ?></td>
+                            <td><?php echo $item['count']; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h3>Tickets por Agente</h3>
+            <table class="report-table">
+                <thead>
                     <tr>
-                        <td><?php echo htmlspecialchars($item['agent']); ?></td>
-                        <td><?php echo $item['count']; ?></td>
+                        <th>Agente</th>
+                        <th>Cantidad</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-    
-    <div class="section">
-        <h3>Tickets por Departamento</h3>
-        <table class="report-table">
-            <thead>
-                <tr>
-                    <th>Departamento</th>
-                    <th>Cantidad</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($ticketsPerDepartment as $item): ?>
+                </thead>
+                <tbody>
+                    <?php foreach ($ticketsPerAgent as $item): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($item['agent']); ?></td>
+                            <td><?php echo $item['count']; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h3>Tickets por Departamento</h3>
+            <table class="report-table">
+                <thead>
                     <tr>
-                        <td><?php echo htmlspecialchars($item['department']); ?></td>
-                        <td><?php echo $item['count']; ?></td>
+                        <th>Departamento</th>
+                        <th>Cantidad</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-    
-    <div class="section">
-        <h3>Gráfico de Tickets por Estado</h3>
-        <canvas id="statusChart" width="400" height="200"></canvas>
+                </thead>
+                <tbody>
+                    <?php foreach ($ticketsPerDepartment as $item): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($item['department']); ?></td>
+                            <td><?php echo $item['count']; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h3>Gráfico de Tickets por Estado</h3>
+            <canvas id="statusChart" width="600" height="300"></canvas>
+        </div>
     </div>
 </body>
 </html>
