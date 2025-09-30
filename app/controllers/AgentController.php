@@ -1,6 +1,6 @@
 <?php
 // AgentController for agent-specific functionality
-// PHP 5.5 compatible
+// PHP 5.5 compatible with sqlsrv
 
 class AgentController {
     private $model;
@@ -20,12 +20,17 @@ class AgentController {
         // Get assigned tickets
         $db = getDBConnection();
         $query = "SELECT t.id, t.title, t.status, t.created_at, u.username as user_name FROM tickets t LEFT JOIN users u ON t.user_id = u.id WHERE t.assignee_id = ? ORDER BY t.created_at DESC";
-        $stmt = $db->prepare($query);
-        $stmt->bind_param("i", $agent_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $tickets = $result->fetch_all(MYSQLI_ASSOC);
-        $stmt->close();
+        $params = array($agent_id);
+        $stmt = sqlsrv_prepare($db, $query, $params);
+        if ($stmt === false || sqlsrv_execute($stmt) === false) {
+            $tickets = array();
+        } else {
+            $tickets = array();
+            while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                $tickets[] = $row;
+            }
+            sqlsrv_free_stmt($stmt);
+        }
         closeDBConnection($db);
         
         include '../app/views/agent/dashboard.php';

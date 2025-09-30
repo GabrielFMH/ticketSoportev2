@@ -1,6 +1,6 @@
 <?php
 // AdminController for admin-specific functionality: reports and customization
-// PHP 5.5 compatible
+// PHP 5.5 compatible with sqlsrv
 
 class AdminController {
     private $reportModel;
@@ -30,40 +30,65 @@ class AdminController {
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_POST['add'])) {
-                $name = $db->real_escape_string($_POST['name']);
-                $description = $db->real_escape_string($_POST['description']);
+                $name = $_POST['name'];
+                $description = $_POST['description'];
                 $dept_id = isset($_POST['department_id']) ? (int)$_POST['department_id'] : null;
-                $query = "INSERT INTO categories (name, description, department_id) VALUES ('$name', '$description', " . ($dept_id ? $dept_id : 'NULL') . ")";
-                if (!$db->query($query)) {
-                    $error = 'Error al agregar categoría: ' . $db->error;
+                $query = "INSERT INTO categories (name, description, department_id) VALUES (?, ?, ?)";
+                $params = array($name, $description, $dept_id);
+                $stmt = sqlsrv_prepare($db, $query, $params);
+                if ($stmt === false || sqlsrv_execute($stmt) === false) {
+                    $error = 'Error al agregar categoría: ' . print_r(sqlsrv_errors(), true);
                 }
+                sqlsrv_free_stmt($stmt);
             } elseif (isset($_POST['edit'])) {
                 $id = (int)$_POST['id'];
-                $name = $db->real_escape_string($_POST['name']);
-                $description = $db->real_escape_string($_POST['description']);
+                $name = $_POST['name'];
+                $description = $_POST['description'];
                 $dept_id = isset($_POST['department_id']) ? (int)$_POST['department_id'] : null;
-                $query = "UPDATE categories SET name = '$name', description = '$description', department_id = " . ($dept_id ? $dept_id : 'NULL') . " WHERE id = $id";
-                if (!$db->query($query)) {
-                    $error = 'Error al editar categoría: ' . $db->error;
+                $query = "UPDATE categories SET name = ?, description = ?, department_id = ? WHERE id = ?";
+                $params = array($name, $description, $dept_id, $id);
+                $stmt = sqlsrv_prepare($db, $query, $params);
+                if ($stmt === false || sqlsrv_execute($stmt) === false) {
+                    $error = 'Error al editar categoría: ' . print_r(sqlsrv_errors(), true);
                 }
+                sqlsrv_free_stmt($stmt);
             } elseif (isset($_POST['delete'])) {
                 $id = (int)$_POST['id'];
-                $query = "DELETE FROM categories WHERE id = $id";
-                if (!$db->query($query)) {
-                    $error = 'Error al eliminar categoría: ' . $db->error;
+                $query = "DELETE FROM categories WHERE id = ?";
+                $params = array($id);
+                $stmt = sqlsrv_prepare($db, $query, $params);
+                if ($stmt === false || sqlsrv_execute($stmt) === false) {
+                    $error = 'Error al eliminar categoría: ' . print_r(sqlsrv_errors(), true);
                 }
+                sqlsrv_free_stmt($stmt);
             }
         }
         
         // Get all categories
         $categories_query = "SELECT c.*, d.name as dept_name FROM categories c LEFT JOIN departments d ON c.department_id = d.id ORDER BY c.name";
-        $categories_result = $db->query($categories_query);
-        $categories = $categories_result ? $categories_result->fetch_all(MYSQLI_ASSOC) : array();
+        $categories_stmt = sqlsrv_query($db, $categories_query);
+        if ($categories_stmt === false) {
+            $categories = array();
+        } else {
+            $categories = array();
+            while ($row = sqlsrv_fetch_array($categories_stmt, SQLSRV_FETCH_ASSOC)) {
+                $categories[] = $row;
+            }
+            sqlsrv_free_stmt($categories_stmt);
+        }
         
         // Get departments for form
         $depts_query = "SELECT id, name FROM departments ORDER BY name";
-        $depts_result = $db->query($depts_query);
-        $departments = $depts_result ? $depts_result->fetch_all(MYSQLI_ASSOC) : array();
+        $depts_stmt = sqlsrv_query($db, $depts_query);
+        if ($depts_stmt === false) {
+            $departments = array();
+        } else {
+            $departments = array();
+            while ($row = sqlsrv_fetch_array($depts_stmt, SQLSRV_FETCH_ASSOC)) {
+                $departments[] = $row;
+            }
+            sqlsrv_free_stmt($depts_stmt);
+        }
         
         closeDBConnection($db);
         include '../app/views/admin/manage_categories.php';

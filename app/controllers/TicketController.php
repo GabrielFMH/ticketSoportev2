@@ -1,6 +1,6 @@
 <?php
 // TicketController for ticket management
-// PHP 5.5 compatible
+// PHP 5.5 compatible with sqlsrv
 
 class TicketController {
     private $model;
@@ -110,9 +110,15 @@ class TicketController {
         if ($ticket_id) {
             // Find admin (role 'admin', any dept)
             $db = getDBConnection();
-            $admin_query = "SELECT id FROM users WHERE role = 'admin' LIMIT 1";
-            $admin_result = $db->query($admin_query);
-            $admin = $admin_result->fetch_assoc();
+            $admin_query = "SELECT id FROM users WHERE role = 'admin'";
+            $admin_stmt = sqlsrv_query($db, $admin_query);
+            if ($admin_stmt === false) {
+                closeDBConnection($db);
+                header("Location: ?controller=ticket&action=view&id=$ticket_id");
+                exit;
+            }
+            $admin = sqlsrv_fetch_array($admin_stmt, SQLSRV_FETCH_ASSOC);
+            sqlsrv_free_stmt($admin_stmt);
             closeDBConnection($db);
             
             if ($admin) {
