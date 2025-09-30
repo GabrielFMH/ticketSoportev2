@@ -22,8 +22,9 @@ class TicketModel {
         
         // Get department from category
         $dept_query = "SELECT department_id FROM categories WHERE id = ?";
-        $params = array($category_id);
-        $dept_stmt = sqlsrv_prepare($this->db, $dept_query, $params);
+        $dept_params = array($category_id);
+        $dept_params_ref = &$dept_params;
+        $dept_stmt = sqlsrv_prepare($this->db, $dept_query, $dept_params_ref);
         if ($dept_stmt === false) {
             die('Error preparing dept query: ' . print_r(sqlsrv_errors(), true));
         }
@@ -35,7 +36,8 @@ class TicketModel {
         // Insert ticket
         $query = "INSERT INTO tickets (user_id, department_id, title, description, contact_info, category_id, priority_id, impact, urgency) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $params = array($user_id, $department_id, $title, $description, $contact_info, $category_id, $priority_id, $impact, $urgency);
-        $stmt = sqlsrv_prepare($this->db, $query, $params);
+        $params_ref = &$params;
+        $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
         if ($stmt === false) {
             die('Error preparing insert: ' . print_r(sqlsrv_errors(), true));
         }
@@ -57,8 +59,9 @@ class TicketModel {
         // Auto-assign: Find available agent in department (simple: first agent with <5 open tickets)
         if ($department_id) {
             $agent_query = "SELECT u.id FROM users u WHERE u.role = 'agent' AND u.department_id = ? AND (SELECT COUNT(*) FROM tickets t WHERE t.assignee_id = u.id AND t.status != 'Cerrado') < 5";
-            $params = array($department_id);
-            $agent_stmt = sqlsrv_prepare($this->db, $agent_query, $params);
+            $agent_params = array($department_id);
+            $agent_params_ref = &$agent_params;
+            $agent_stmt = sqlsrv_prepare($this->db, $agent_query, $agent_params_ref);
             if ($agent_stmt === false) {
                 die('Error preparing agent query: ' . print_r(sqlsrv_errors(), true));
             }
@@ -84,7 +87,8 @@ class TicketModel {
     public function getUserTickets($user_id) {
         $query = "SELECT t.id, t.title, t.status, t.created_at FROM tickets t WHERE t.user_id = ? ORDER BY t.created_at DESC";
         $params = array($user_id);
-        $stmt = sqlsrv_prepare($this->db, $query, $params);
+        $params_ref = &$params;
+        $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
         if ($stmt === false) {
             return array();
         }
@@ -110,7 +114,8 @@ class TicketModel {
                   LEFT JOIN departments d ON t.department_id = d.id
                   WHERE t.id = ?";
         $params = array($ticket_id);
-        $stmt = sqlsrv_prepare($this->db, $query, $params);
+        $params_ref = &$params;
+        $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
         if ($stmt === false) {
             return null;
         }
@@ -132,7 +137,8 @@ class TicketModel {
         // Update status
         $query = "UPDATE tickets SET status = ?, updated_at = GETDATE() WHERE id = ?";
         $params = array($status, $ticket_id);
-        $stmt = sqlsrv_prepare($this->db, $query, $params);
+        $params_ref = &$params;
+        $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
         $success = ($stmt !== false && sqlsrv_execute($stmt) !== false);
         sqlsrv_free_stmt($stmt);
         
@@ -161,7 +167,8 @@ class TicketModel {
         
         $query = "INSERT INTO history (ticket_id, action, notes, user_id) VALUES (?, ?, ?, ?)";
         $params = array($ticket_id, $action, $notes, $user_id);
-        $stmt = sqlsrv_prepare($this->db, $query, $params);
+        $params_ref = &$params;
+        $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
         if ($stmt !== false) {
             sqlsrv_execute($stmt);
         }
@@ -171,7 +178,8 @@ class TicketModel {
     private function getTicketHistory($ticket_id) {
         $query = "SELECT h.*, u.username FROM history h LEFT JOIN users u ON h.user_id = u.id WHERE h.ticket_id = ? ORDER BY h.timestamp ASC";
         $params = array($ticket_id);
-        $stmt = sqlsrv_prepare($this->db, $query, $params);
+        $params_ref = &$params;
+        $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
         if ($stmt === false) {
             return array();
         }
@@ -194,16 +202,18 @@ class TicketModel {
         
         // Update ticket assignee
         $update_query = "UPDATE tickets SET assignee_id = ? WHERE id = ?";
-        $params = array($agent_id, $ticket_id);
-        $update_stmt = sqlsrv_prepare($this->db, $update_query, $params);
+        $update_params = array($agent_id, $ticket_id);
+        $update_params_ref = &$update_params;
+        $update_stmt = sqlsrv_prepare($this->db, $update_query, $update_params_ref);
         $update_success = ($update_stmt !== false && sqlsrv_execute($update_stmt) !== false);
         sqlsrv_free_stmt($update_stmt);
         
         if ($update_success) {
             // Add assignment record
             $assign_query = "INSERT INTO assignments (ticket_id, agent_id, department_id) VALUES (?, ?, ?)";
-            $params = array($ticket_id, $agent_id, $department_id);
-            $assign_stmt = sqlsrv_prepare($this->db, $assign_query, $params);
+            $assign_params = array($ticket_id, $agent_id, $department_id);
+            $assign_params_ref = &$assign_params;
+            $assign_stmt = sqlsrv_prepare($this->db, $assign_query, $assign_params_ref);
             if ($assign_stmt !== false) {
                 sqlsrv_execute($assign_stmt);
             }
@@ -265,7 +275,8 @@ class TicketModel {
     private function getUserEmail($user_id) {
         $query = "SELECT email FROM users WHERE id = ?";
         $params = array($user_id);
-        $stmt = sqlsrv_prepare($this->db, $query, $params);
+        $params_ref = &$params;
+        $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
         if ($stmt === false) {
             return '';
         }
@@ -287,8 +298,9 @@ class TicketModel {
         
         // Log notification
         $log_query = "INSERT INTO notifications (ticket_id, type, sent_to) VALUES (?, ?, ?)";
-        $params = array($ticket_id, $type, $email);
-        $log_stmt = sqlsrv_prepare($this->db, $log_query, $params);
+        $log_params = array($ticket_id, $type, $email);
+        $log_params_ref = &$log_params;
+        $log_stmt = sqlsrv_prepare($this->db, $log_query, $log_params_ref);
         if ($log_stmt !== false) {
             sqlsrv_execute($log_stmt);
         }
@@ -302,8 +314,9 @@ class TicketModel {
         // Update status if failed
         if (!$sent) {
             $update_log = "UPDATE notifications SET status = 'fallido' WHERE ticket_id = ? AND sent_to = ? AND status = 'enviado'";
-            $params = array($ticket_id, $email);
-            $update_stmt = sqlsrv_prepare($this->db, $update_log, $params);
+            $update_params = array($ticket_id, $email);
+            $update_params_ref = &$update_params;
+            $update_stmt = sqlsrv_prepare($this->db, $update_log, $update_params_ref);
             if ($update_stmt !== false) {
                 sqlsrv_execute($update_stmt);
             }

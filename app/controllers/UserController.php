@@ -16,7 +16,8 @@ class UserController {
             
             $query = "SELECT id, username, role FROM users WHERE username = ? AND password = ?";
             $params = array($username, $password);
-            $stmt = sqlsrv_prepare($this->db, $query, $params);
+            $params_ref = &$params;
+            $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
             if ($stmt === false) {
                 $error = 'Error preparing query: ' . print_r(sqlsrv_errors(), true);
             } else {
@@ -66,7 +67,8 @@ class UserController {
                 // Check if user exists
                 $check_query = "SELECT id FROM users WHERE username = ? OR email = ?";
                 $check_params = array($username, $email);
-                $check_stmt = sqlsrv_prepare($this->db, $check_query, $check_params);
+                $check_params_ref = &$check_params;
+                $check_stmt = sqlsrv_prepare($this->db, $check_query, $check_params_ref);
                 if ($check_stmt === false || sqlsrv_execute($check_stmt) === false) {
                     $error = 'Error checking user: ' . print_r(sqlsrv_errors(), true);
                 } else {
@@ -77,7 +79,8 @@ class UserController {
                     } else {
                         $query = "INSERT INTO users (username, email, password, role, department_id) VALUES (?, ?, ?, ?, ?)";
                         $params = array($username, $email, $password, $role, $department_id);
-                        $stmt = sqlsrv_prepare($this->db, $query, $params);
+                        $params_ref = &$params;
+                        $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
                         if ($stmt === false || sqlsrv_execute($stmt) === false) {
                             $error = 'Error al registrar: ' . print_r(sqlsrv_errors(), true);
                         } else {
@@ -114,7 +117,8 @@ class UserController {
             // Query user's tickets
             $query = "SELECT t.id, t.title, t.status, t.created_at FROM tickets t WHERE t.user_id = ? ORDER BY t.created_at DESC";
             $params = array($userId);
-            $stmt = sqlsrv_prepare($this->db, $query, $params);
+            $params_ref = &$params;
+            $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
             if ($stmt === false || sqlsrv_execute($stmt) === false) {
                 $tickets = array();
             } else {

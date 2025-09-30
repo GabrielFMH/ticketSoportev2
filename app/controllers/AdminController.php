@@ -35,7 +35,8 @@ class AdminController {
                 $dept_id = isset($_POST['department_id']) ? (int)$_POST['department_id'] : null;
                 $query = "INSERT INTO categories (name, description, department_id) VALUES (?, ?, ?)";
                 $params = array($name, $description, $dept_id);
-                $stmt = sqlsrv_prepare($db, $query, $params);
+                $params_ref = &$params;
+                $stmt = sqlsrv_prepare($db, $query, $params_ref);
                 if ($stmt === false || sqlsrv_execute($stmt) === false) {
                     $error = 'Error al agregar categoría: ' . print_r(sqlsrv_errors(), true);
                 }
@@ -47,7 +48,8 @@ class AdminController {
                 $dept_id = isset($_POST['department_id']) ? (int)$_POST['department_id'] : null;
                 $query = "UPDATE categories SET name = ?, description = ?, department_id = ? WHERE id = ?";
                 $params = array($name, $description, $dept_id, $id);
-                $stmt = sqlsrv_prepare($db, $query, $params);
+                $params_ref = &$params;
+                $stmt = sqlsrv_prepare($db, $query, $params_ref);
                 if ($stmt === false || sqlsrv_execute($stmt) === false) {
                     $error = 'Error al editar categoría: ' . print_r(sqlsrv_errors(), true);
                 }
@@ -56,7 +58,8 @@ class AdminController {
                 $id = (int)$_POST['id'];
                 $query = "DELETE FROM categories WHERE id = ?";
                 $params = array($id);
-                $stmt = sqlsrv_prepare($db, $query, $params);
+                $params_ref = &$params;
+                $stmt = sqlsrv_prepare($db, $query, $params_ref);
                 if ($stmt === false || sqlsrv_execute($stmt) === false) {
                     $error = 'Error al eliminar categoría: ' . print_r(sqlsrv_errors(), true);
                 }

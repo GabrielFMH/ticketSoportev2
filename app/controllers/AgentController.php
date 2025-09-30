@@ -21,7 +21,8 @@ class AgentController {
         $db = getDBConnection();
         $query = "SELECT t.id, t.title, t.status, t.created_at, u.username as user_name FROM tickets t LEFT JOIN users u ON t.user_id = u.id WHERE t.assignee_id = ? ORDER BY t.created_at DESC";
         $params = array($agent_id);
-        $stmt = sqlsrv_prepare($db, $query, $params);
+        $params_ref = &$params;
+        $stmt = sqlsrv_prepare($db, $query, $params_ref);
         if ($stmt === false || sqlsrv_execute($stmt) === false) {
             $tickets = array();
         } else {

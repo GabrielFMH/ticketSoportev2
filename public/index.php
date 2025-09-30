@@ -4,6 +4,10 @@
 
 session_start();
 
+// Suppress warnings from displaying (keep errors)
+ini_set('display_errors', 0);
+error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
+
 // Include config
 require_once '../config/database.php';
 
