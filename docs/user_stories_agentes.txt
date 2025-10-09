@@ -1,0 +1,110 @@
+HISTORIAS DE USUARIO - AGENTES
+==============================
+
+Como agente del sistema de tickets UPT, necesito poder:
+
+AGENTE-001: Ver tickets asignados a mi departamento
+Como agente autenticado
+Quiero ver todos los tickets asignados a mi departamento
+Para gestionar las solicitudes de soporte de mi área
+
+Criterios de aceptación:
+- Debo ver tickets de mi departamento independientemente del agente asignado
+- Debo poder filtrar por estado del ticket
+- Debo poder filtrar por prioridad
+- Debo ver información básica: ID, título, usuario, fecha de creación
+- Los tickets deben estar ordenados por prioridad y fecha
+
+AGENTE-002: Gestionar tickets asignados personalmente
+Como agente autenticado
+Quiero gestionar los tickets asignados directamente a mí
+Para trabajar en las solicitudes de mi responsabilidad
+
+Criterios de aceptación:
+- Debo ver solo los tickets asignados a mí
+- Debo poder cambiar el estado del ticket (Abierto → En Progreso → Resuelto → Cerrado)
+- Debo poder agregar notas internas al ticket
+- Debo poder actualizar información del ticket
+- Los cambios deben registrarse en el historial
+
+AGENTE-003: Ver detalle completo de un ticket
+Como agente autenticado
+Quiero ver toda la información detallada de un ticket
+Para entender completamente el problema del usuario
+
+Criterios de aceptación:
+- Debo ver toda la información del ticket (título, descripción, contacto, etc.)
+- Debo ver el historial completo de cambios
+- Debo ver información del usuario que creó el ticket
+- Debo ver el departamento y categoría asignados
+- Debo poder ver notas anteriores de otros agentes
+
+AGENTE-004: Actualizar estado de tickets
+Como agente autenticado
+Quiero actualizar el estado de los tickets asignados
+Para reflejar el progreso del trabajo realizado
+
+Criterios de aceptación:
+- Debo poder cambiar entre estados: Abierto, En Progreso, Resuelto, Cerrado
+- Al cambiar el estado debo poder agregar notas explicativas
+- El cambio debe registrarse en el historial del ticket
+- Deben enviarse notificaciones al usuario sobre el cambio
+- No debo poder cambiar estados de tickets no asignados a mí
+
+AGENTE-005: Solicitar información adicional al usuario
+Como agente autenticado
+Quiero solicitar información adicional al usuario
+Para resolver casos que requieren más detalles
+
+Criterios de aceptación:
+- Debo poder agregar una nota solicitando información específica
+- El sistema debe enviar notificación al usuario
+- La solicitud debe quedar registrada en el historial
+- Debo poder marcar cuando espero respuesta del usuario
+
+AGENTE-006: Escalar tickets a administradores
+Como agente autenticado
+Quiero escalar tickets complejos a administradores
+Para obtener apoyo en casos que requieren mayor autoridad
+
+Criterios de aceptación:
+- Debo poder seleccionar tickets para escalar
+- Debo poder agregar una razón para la escalación
+- El ticket debe reasignarse automáticamente a un administrador disponible
+- Debe enviarse notificación al administrador asignado
+- La escalación debe registrarse en el historial
+
+AGENTE-007: Gestionar múltiples tickets simultáneamente
+Como agente autenticado
+Quiero gestionar múltiples tickets al mismo tiempo
+Para ser eficiente en mi trabajo diario
+
+Criterios de aceptación:
+- Debo poder ver una lista clara de todos mis tickets activos
+- Debo poder priorizar tickets según su urgencia e impacto
+- Debo poder trabajar en múltiples tickets sin perder el progreso
+- Debo recibir recordatorios de tickets pendientes
+
+AGENTE-008: Acceder a dashboard de agente
+Como agente autenticado
+Quiero acceder a un dashboard especializado para agentes
+Para tener una visión general de mi carga de trabajo
+
+Criterios de aceptación:
+- Debo ver estadísticas de mis tickets (total, por estado, por prioridad)
+- Debo ver tickets pendientes y próximos vencimientos
+- Debo tener acceso rápido a funciones frecuentes (cambiar estado, agregar notas)
+- Debo ver métricas de rendimiento (tickets resueltos, tiempo promedio)
+
+AGENTE-009: Buscar y filtrar tickets
+Como agente autenticado
+Quiero buscar y filtrar tickets de manera avanzada
+Para encontrar rápidamente información específica
+
+Criterios de aceptación:
+- Debo poder buscar por ID, título o descripción del ticket
+- Debo poder filtrar por usuario, departamento, categoría
+- Debo poder filtrar por rango de fechas
+- Debo poder filtrar por prioridad e impacto
+- Debo poder combinar múltiples filtros
+- Los resultados deben ser exportables o imprimibles

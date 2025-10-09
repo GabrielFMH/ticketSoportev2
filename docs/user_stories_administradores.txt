@@ -1,0 +1,137 @@
+HISTORIAS DE USUARIO - ADMINISTRADORES
+=====================================
+
+Como administrador del sistema de tickets UPT, necesito poder:
+
+ADMIN-001: Gestionar usuarios del sistema
+Como administrador autenticado
+Quiero gestionar todos los usuarios del sistema
+Para mantener el control de acceso y permisos
+
+Criterios de aceptación:
+- Debo poder crear nuevos usuarios (agentes, usuarios finales)
+- Debo poder editar información de usuarios existentes
+- Debo poder asignar roles (user, agent, admin)
+- Debo poder asignar usuarios a departamentos específicos
+- Debo poder desactivar/activar cuentas de usuario
+- Debo poder restablecer contraseñas de usuarios
+
+ADMIN-002: Gestionar categorías de tickets
+Como administrador autenticado
+Quiero gestionar las categorías de tickets
+Para mantener el sistema organizado según las necesidades
+
+Criterios de aceptación:
+- Debo poder crear nuevas categorías de problemas
+- Debo poder editar categorías existentes
+- Debo poder asignar categorías a departamentos específicos
+- Debo poder desactivar categorías obsoletas
+- Debo poder establecer descripciones detalladas para cada categoría
+
+ADMIN-003: Gestionar departamentos
+Como administrador autenticado
+Quiero gestionar los departamentos de la organización
+Para reflejar la estructura organizacional actual
+
+Criterios de aceptación:
+- Debo poder crear nuevos departamentos
+- Debo poder editar información de departamentos existentes
+- Debo poder asignar agentes a departamentos específicos
+- Debo poder establecer responsables de departamento
+- Debo poder desactivar departamentos cuando sea necesario
+
+ADMIN-004: Supervisar todos los tickets del sistema
+Como administrador autenticado
+Quiero supervisar todos los tickets del sistema
+Para tener visibilidad completa del estado del soporte
+
+Criterios de aceptación:
+- Debo poder ver todos los tickets independientemente del departamento
+- Debo poder filtrar por departamento, estado, prioridad, agente
+- Debo poder ver métricas generales del sistema
+- Debo poder identificar tickets críticos o con mucho tiempo abierto
+- Debo poder generar reportes de actividad
+
+ADMIN-005: Gestionar asignaciones de tickets
+Como administrador autenticado
+Quiero gestionar las asignaciones de tickets
+Para asegurar una distribución óptima del trabajo
+
+Criterios de aceptación:
+- Debo poder reasignar tickets entre agentes
+- Debo poder asignar tickets manualmente cuando la asignación automática falle
+- Debo poder equilibrar la carga de trabajo entre agentes
+- Debo poder ver la carga de trabajo actual de cada agente
+- Los cambios de asignación deben registrarse en el historial
+
+ADMIN-006: Gestionar prioridades del sistema
+Como administrador autenticado
+Quiero gestionar los niveles de prioridad
+Para adaptar el sistema a las políticas de la organización
+
+Criterios de aceptación:
+- Debo poder crear nuevos niveles de prioridad
+- Debo poder editar prioridades existentes
+- Debo poder establecer colores asociados a cada prioridad
+- Debo poder ordenar las prioridades por importancia
+- Debo poder desactivar prioridades cuando no sean necesarias
+
+ADMIN-007: Acceder a dashboard administrativo
+Como administrador autenticado
+Quiero acceder a un dashboard administrativo completo
+Para monitorear el estado general del sistema
+
+Criterios de aceptación:
+- Debo ver métricas generales (total tickets, por estado, por departamento)
+- Debo ver gráficos de tendencias y patrones
+- Debo ver lista de tickets críticos que requieren atención inmediata
+- Debo ver rendimiento de agentes (tickets resueltos, tiempo promedio)
+- Debo tener acceso rápido a funciones administrativas frecuentes
+
+ADMIN-008: Gestionar configuraciones del sistema
+Como administrador autenticado
+Quiero gestionar configuraciones del sistema
+Para adaptar el comportamiento del sistema a las necesidades
+
+Criterios de aceptación:
+- Debo poder configurar reglas de asignación automática
+- Debo poder establecer umbrales para alertas
+- Debo poder configurar parámetros de notificación
+- Debo poder establecer políticas de escalación
+- Debo poder configurar límites de carga de trabajo por agente
+
+ADMIN-009: Generar reportes avanzados
+Como administrador autenticado
+Quiero generar reportes detallados del sistema
+Para análisis y toma de decisiones
+
+Criterios de aceptación:
+- Debo poder generar reportes por período de tiempo
+- Debo poder generar reportes por departamento o agente
+- Debo poder generar reportes de rendimiento y productividad
+- Debo poder exportar reportes en diferentes formatos (PDF, Excel)
+- Debo poder programar reportes automáticos
+
+ADMIN-010: Gestionar historial y auditoría
+Como administrador autenticado
+Quiero acceder al historial completo del sistema
+Para auditorías y análisis forense
+
+Criterios de aceptación:
+- Debo poder ver el historial completo de cambios de cualquier ticket
+- Debo poder rastrear acciones de usuarios específicos
+- Debo poder ver logs de notificaciones enviadas
+- Debo poder generar reportes de auditoría
+- Debo poder archivar historial antiguo según políticas de retención
+
+ADMIN-011: Gestionar permisos y seguridad
+Como administrador autenticado
+Quiero gestionar permisos y seguridad del sistema
+Para mantener la integridad y confidencialidad de los datos
+
+Criterios de aceptación:
+- Debo poder establecer políticas de contraseñas
+- Debo poder configurar niveles de acceso por rol
+- Debo poder auditar accesos al sistema
+- Debo poder gestionar sesiones activas de usuarios
+- Debo poder configurar medidas de seguridad adicionales
