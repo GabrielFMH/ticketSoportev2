@@ -1,0 +1,85 @@
+HISTORIAS DE USUARIO - USUARIOS FINALES
+=====================================
+
+Como usuario final del sistema de tickets UPT, necesito poder:
+
+USUARIO-001: Crear un nuevo ticket de soporte
+Como usuario autenticado
+Quiero crear un nuevo ticket de soporte
+Para reportar un problema o solicitar ayuda
+
+Criterios de aceptación:
+- Debo poder seleccionar una categoría del problema
+- Debo poder establecer la prioridad del ticket
+- Debo poder ingresar título, descripción e información de contacto
+- Debo poder especificar el impacto y urgencia del problema
+- El sistema debe asignar automáticamente un agente disponible
+- Debo recibir una confirmación con el ID del ticket creado
+
+USUARIO-002: Ver mis tickets creados
+Como usuario autenticado
+Quiero ver una lista de todos mis tickets
+Para hacer seguimiento del estado de mis solicitudes
+
+Criterios de aceptación:
+- Debo ver el título, estado y fecha de creación de cada ticket
+- Los tickets deben estar ordenados por fecha (más recientes primero)
+- Debo poder acceder al detalle completo de cada ticket
+- Solo debo ver mis propios tickets
+
+USUARIO-003: Ver detalle completo de un ticket
+Como usuario autenticado
+Quiero ver toda la información de un ticket específico
+Para conocer el progreso y detalles de mi solicitud
+
+Criterios de aceptación:
+- Debo ver título, descripción, categoría, prioridad e información de contacto
+- Debo ver el historial completo de cambios del ticket
+- Debo ver el agente asignado (si aplica)
+- Debo ver el departamento responsable
+- Debo ver la fecha de creación y última actualización
+
+USUARIO-004: Recibir notificaciones de cambios
+Como usuario autenticado
+Quiero recibir notificaciones por email
+Para estar informado sobre cambios en mis tickets
+
+Criterios de aceptación:
+- Debo recibir email cuando se actualice el estado de mi ticket
+- Debo recibir email cuando se asigne un agente a mi ticket
+- Debo recibir email cuando se agreguen notas al ticket
+- Las notificaciones deben incluir información relevante del ticket
+
+USUARIO-005: Gestionar mi perfil de usuario
+Como usuario autenticado
+Quiero gestionar mi información personal
+Para mantener mis datos actualizados
+
+Criterios de aceptación:
+- Debo poder ver mi información actual (nombre, email, departamento)
+- Debo poder actualizar mi información de contacto
+- Debo poder cambiar mi contraseña
+- Los cambios deben guardarse correctamente en el sistema
+
+USUARIO-006: Acceder al dashboard personalizado
+Como usuario autenticado
+Quiero acceder a un dashboard personalizado
+Para tener una visión general de mis tickets
+
+Criterios de aceptación:
+- Debo ver un resumen de mis tickets por estado
+- Debo ver mis tickets más recientes
+- Debo tener acceso rápido a crear nuevos tickets
+- La información debe estar organizada de forma clara
+
+USUARIO-007: Buscar y filtrar mis tickets
+Como usuario autenticado
+Quiero buscar y filtrar mis tickets
+Para encontrar rápidamente tickets específicos
+
+Criterios de aceptación:
+- Debo poder buscar por título o ID del ticket
+- Debo poder filtrar por estado del ticket
+- Debo poder filtrar por categoría
+- Debo poder filtrar por fecha de creación
+- Los resultados deben mostrarse de forma clara y paginada
