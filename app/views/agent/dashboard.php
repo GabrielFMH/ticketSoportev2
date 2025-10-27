@@ -70,9 +70,28 @@
                             <td><?php echo htmlspecialchars($ticket['title']); ?></td>
                             <td><?php echo htmlspecialchars($ticket['user_name']); ?></td>
                             <td><span class="status status-<?php echo strtolower(str_replace(' ', '-', $ticket['status'])); ?>"><?php echo $ticket['status']; ?></span></td>
-                            <td><?php echo date('d/m/Y H:i', strtotime($ticket['created_at'])); ?></td>
+                            <td><?php echo $ticket['created_at'] ? $ticket['created_at']->format('d/m/Y H:i') : 'N/A'; ?></td>
                             <td class="actions">
-                                <a href="?controller=ticket&action=view&id=<?php echo $ticket['id']; ?>">Ver/Actualizar</a>
+                                <?php if (!$ticket['assignee_id']): ?>
+                                <form method="post" action="?controller=ticket&action=accept" style="display: inline;">
+                                    <input type="hidden" name="ticket_id" value="<?php echo $ticket['id']; ?>">
+                                    <button type="submit" class="btn btn-primary">Aceptar</button>
+                                </form>
+                                <?php endif; ?>
+                                <?php if ($ticket['assignee_id'] == $_SESSION['user_id']): ?>
+                                <form method="post" action="?controller=ticket&action=update" style="display: inline; margin-left: 5px;">
+                                    <input type="hidden" name="ticket_id" value="<?php echo $ticket['id']; ?>">
+                                    <select name="status" style="padding: 5px;">
+                                        <option value="Abierto" <?php if ($ticket['status'] == 'Abierto') echo 'selected'; ?>>Abierto</option>
+                                        <option value="En Progreso" <?php if ($ticket['status'] == 'En Progreso') echo 'selected'; ?>>En Progreso</option>
+                                        <option value="Resuelto" <?php if ($ticket['status'] == 'Resuelto') echo 'selected'; ?>>Resuelto</option>
+                                        <option value="Cerrado" <?php if ($ticket['status'] == 'Cerrado') echo 'selected'; ?>>Cerrado</option>
+                                    </select>
+                                    <input type="hidden" name="notes" value="">
+                                    <button type="submit" class="btn btn-primary">Cambiar</button>
+                                </form>
+                                <?php endif; ?>
+                                <a href="?controller=ticket&action=view&id=<?php echo $ticket['id']; ?>" class="btn btn-primary">Ver/Actualizar</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>

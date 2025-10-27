@@ -159,7 +159,7 @@ class TicketModel {
         return $success;
     }
     
-    private function addHistory($ticket_id, $action, $notes, $user_id) {
+    public function addHistory($ticket_id, $action, $notes, $user_id) {
         $ticket_id = (int)$ticket_id;
         $action = $action;
         $notes = $notes ? $notes : null;
