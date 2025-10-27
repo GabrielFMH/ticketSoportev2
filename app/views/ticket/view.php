@@ -104,12 +104,20 @@
                 <span class="detail-value"><?php echo htmlspecialchars($ticket['user_name']); ?></span>
             </div>
             <div class="detail-row">
+                <span class="detail-label">Impacto:</span>
+                <span class="detail-value"><?php echo htmlspecialchars($ticket['impact'] ?? 'N/A'); ?></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Urgencia:</span>
+                <span class="detail-value"><?php echo htmlspecialchars($ticket['urgency'] ?? 'N/A'); ?></span>
+            </div>
+            <div class="detail-row">
                 <span class="detail-label">Fecha de Creación:</span>
-                <span class="detail-value"><?php echo date('d/m/Y H:i', strtotime($ticket['created_at'])); ?></span>
+                <span class="detail-value"><?php echo $ticket['created_at'] ? $ticket['created_at']->format('d/m/Y H:i') : 'N/A'; ?></span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Última Actualización:</span>
-                <span class="detail-value"><?php echo date('d/m/Y H:i', strtotime($ticket['updated_at'])); ?></span>
+                <span class="detail-value"><?php echo $ticket['updated_at'] ? $ticket['updated_at']->format('d/m/Y H:i') : 'N/A'; ?></span>
             </div>
         </div>
         
@@ -124,7 +132,7 @@
                         <?php if ($item['notes']): ?>
                             <div class="notes"><?php echo nl2br(htmlspecialchars($item['notes'])); ?></div>
                         <?php endif; ?>
-                        <div class="timestamp">Por <?php echo htmlspecialchars(isset($item['username']) ? $item['username'] : 'Sistema'); ?> el <?php echo date('d/m/Y H:i', strtotime($item['timestamp'])); ?></div>
+                        <div class="timestamp">Por <?php echo htmlspecialchars(isset($item['username']) ? $item['username'] : 'Sistema'); ?> el <?php echo $item['timestamp'] ? $item['timestamp']->format('d/m/Y H:i') : 'N/A'; ?></div>
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
