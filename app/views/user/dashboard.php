@@ -79,6 +79,11 @@
                         <td><?php echo $ticket['updated_at'] ? $ticket['updated_at']->format('d/m/Y H:i') : 'N/A'; ?></td>
                         <td class="actions">
                             <a href="?controller=ticket&action=view&id=<?php echo $ticket['id']; ?>">Ver Detalles</a>
+                            <?php if ($ticket['status'] === 'Abierto'): ?>
+                                <a href="?controller=ticket&action=cancel&id=<?php echo $ticket['id']; ?>"
+                                   onclick="return confirm('¿Estás seguro de que deseas cancelar este ticket?');"
+                                   style="color: #DC3545; margin-left: 10px;">Cancelar</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>

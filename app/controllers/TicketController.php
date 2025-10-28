@@ -116,6 +116,43 @@ class TicketController {
         exit;
     }
     
+    public function cancel() {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ?controller=user&action=login');
+            exit;
+        }
+        
+        $ticket_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        if (!$ticket_id) {
+            header('Location: ?controller=user&action=dashboard');
+            exit;
+        }
+        
+        $ticket = $this->model->getTicketById($ticket_id);
+        
+        // Check if user owns the ticket and it's in "Abierto" status
+        $role = $_SESSION['role'];
+        $user_id = $_SESSION['user_id'];
+        if ($role === 'user' && ($ticket['user_id'] != $user_id || $ticket['status'] !== 'Abierto')) {
+            $error = 'No tienes permiso para cancelar este ticket';
+            include '../app/views/errors/error.php';
+            exit;
+        }
+        
+        // Cancel the ticket by setting status to "Cerrado"
+        $success = $this->model->updateTicketStatus($ticket_id, 'Cerrado', 'Ticket cancelado por el usuario', $user_id);
+        
+        if ($success) {
+            $message = 'Ticket cancelado exitosamente';
+        } else {
+            $error = 'Error al cancelar el ticket';
+        }
+        
+        // Redirect back to dashboard
+        header('Location: ?controller=user&action=dashboard');
+        exit;
+    }
+    
     // For escalation (simple: reassign to admin if not resolved)
     public function escalate() {
         if ($_SESSION['role'] !== 'agent') {

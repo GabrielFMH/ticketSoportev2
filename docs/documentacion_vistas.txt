@@ -1,0 +1,79 @@
+# Documentación de Vistas del Sistema de Tickets
+
+## 1. Vista de Usuario (User Dashboard) - app/views/user/dashboard.php
+
+### Componentes Clave
+- **Header**: Muestra el nombre del usuario y un enlace para cerrar sesión.
+- **Navegación**: Enlaces para crear un nuevo ticket y ver mis tickets.
+- **Tabla de Tickets**: Lista de tickets del usuario con columnas para ID, Título, Estado, Fecha de Creación y Acciones.
+- **Estilos CSS**: Diseño responsivo con colores y efectos hover.
+
+### Funciones Incluidas
+- **Visualización de Tickets**: Muestra todos los tickets del usuario con detalles como estado y fecha.
+- **Enlaces de Acción**: Permite ver detalles de cada ticket.
+- **Manejo de Estados Vacíos**: Muestra un mensaje si no hay tickets.
+
+### Elementos Globales
+- **Sesión de Usuario**: Utiliza $_SESSION para mostrar el nombre del usuario.
+- **Enlaces de Navegación**: Enlaces a controladores como ticket y user.
+- **Estilos Comunes**: Clases CSS para status, acciones y tabla.
+
+## 2. Vista de Agente (Agent Dashboard) - app/views/agent/dashboard.php
+
+### Componentes Clave
+- **Header**: Saludo al agente con icono y enlaces para dashboard y logout.
+- **Tabla de Tickets**: Lista de tickets asignados o del departamento con columnas para ID, Título, Usuario, Estado, Fecha y Acciones.
+- **Formularios de Acción**: Botones para aceptar tickets y cambiar estados.
+- **Estilos CSS**: Diseño moderno con gradientes y efectos.
+
+### Funciones Incluidas
+- **Aceptar Tickets**: Formulario para asignar tickets al agente.
+- **Cambiar Estado**: Selector para actualizar el estado de los tickets asignados.
+- **Ver Detalles**: Enlace para ver y actualizar tickets.
+- **Filtrado por Departamento**: Muestra tickets del departamento del agente.
+
+### Elementos Globales
+- **Sesión de Agente**: Usa $_SESSION para rol y usuario.
+- **Enlaces de Acción**: Formularios que envían a controladores como ticket.
+- **Estilos Responsivos**: Media queries para dispositivos móviles.
+
+## 3. Vista de Administrador (Admin Dashboard) - app/views/admin/dashboard.php
+
+### Componentes Clave
+- **Header**: Saludo al admin con enlaces a reportes y gestión de categorías.
+- **Métricas**: Tarjetas con estadísticas como tiempo promedio de resolución y total de tickets.
+- **Tablas de Reportes**: Tickets por categoría, agente y departamento.
+- **Gráfico**: Canvas para visualización de tickets por estado.
+- **Estilos CSS**: Grid layout y efectos hover.
+
+### Funciones Incluidas
+- **Visualización de Métricas**: Muestra estadísticas calculadas.
+- **Reportes por Categoría/Agente/Departamento**: Tablas con conteos.
+- **Gráfico de Estados**: Representación visual de tickets por estado.
+- **Navegación**: Enlaces a funciones administrativas.
+
+### Elementos Globales
+- **Sesión de Admin**: Usa $_SESSION para usuario y rol.
+- **JavaScript**: Script para generar gráfico con Canvas.
+- **Estilos Avanzados**: Gradientes, grid y animaciones.
+
+## 4. Vista de Ticket (Ticket View) - app/views/ticket/view.php
+
+### Componentes Clave
+- **Header**: Título del ticket con ID y enlaces de navegación.
+- **Detalles del Ticket**: Filas con información como título, descripción, estado, etc.
+- **Historial**: Lista de acciones y cambios en el ticket.
+- **Formulario de Actualización**: Para agentes/admins actualizar estado y notas.
+- **Estilos CSS**: Layout responsivo con secciones.
+
+### Funciones Incluidas
+- **Visualización de Detalles**: Muestra todos los campos del ticket.
+- **Historial de Cambios**: Lista cronológica de acciones.
+- **Actualización de Estado**: Formulario para cambiar estado y agregar notas.
+- **Escalado**: Opción para escalar a admin (para agentes).
+- **Comentarios**: Para usuarios agregar comentarios.
+
+### Elementos Globales
+- **Sesión de Usuario**: Diferencia funciones por rol (user, agent, admin).
+- **Enlaces de Acción**: Formularios que envían a controladores.
+- **Estilos Detallados**: Clases para detalles, historia y formularios.
