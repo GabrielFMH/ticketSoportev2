@@ -103,7 +103,7 @@
                     <label for="notes">Comentario:</label>
                     <textarea name="notes" placeholder="Agregue un comentario o información adicional..."></textarea>
                     <div class="button-group">
-                        <button type="submit">Enviar Comentario</button>
+                        <button type="submit" class="btn btn-primary">Enviar Comentario</button>
                     </div>
                 </form>
             </div>

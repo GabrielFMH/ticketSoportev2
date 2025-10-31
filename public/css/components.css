@@ -239,9 +239,9 @@ input:required:valid {
 .table td,
 .report-table th,
 .report-table td {
-    padding: 8px 15px;
+    padding: 0px 15px;
     text-align: left;
-    border-bottom: 1px solid #DEE2E6;
+    border-bottom: 2px solid #CBD5E0;
     word-wrap: break-word;
 }
 
@@ -251,6 +251,7 @@ input:required:valid {
     background: linear-gradient(135deg, #007BFF, #0056b3);
     color: #FFFFFF;
     font-weight: bold;
+    border-bottom: 3px solid #004494;
 }
 
 .table th {
@@ -262,16 +263,21 @@ input:required:valid {
     color: #FFFFFF;
 }
 
-.tickets-table td,
-.table td,
-.report-table td {
+.tickets-table tr:nth-child(even) td,
+.table tr:nth-child(even) td {
+    background: #F8F9FA;
+}
+
+.tickets-table tr:nth-child(odd) td,
+.table tr:nth-child(odd) td {
     background: #FFFFFF;
 }
 
 .tickets-table tr:hover,
 .table tr:hover,
 .report-table tr:hover {
-    background: #F8F9FA;
+    background: #E3F2FD !important;
+    box-shadow: inset 0 0 5px rgba(0,123,255,0.2);
 }
 
 /* ========================================
@@ -426,7 +432,18 @@ input:required:valid {
     transition: all 0.3s;
 }
 
-.actions a:hover {
+.actions a.btn-primary {
+    color: #FFFFFF !important;
+}
+
+.actions a.btn-primary:hover {
+    background: #0056b3;
+    color: #FFFFFF !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+}
+
+.actions a:not(.btn-primary):hover {
     background: #007BFF;
     color: #FFFFFF;
     transform: translateY(-2px);

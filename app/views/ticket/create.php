@@ -9,7 +9,7 @@
 <body>
     <div class="header">
         <h1>Crear Nuevo Ticket</h1>
-        <a href="?controller=user&action=dashboard" class="nav">Volver al Dashboard</a>
+        <a href="?controller=user&action=dashboard" class="logout">Volver al Dashboard</a>
         <a href="?controller=user&action=logout" class="logout">Cerrar Sesión</a>
     </div>
     
@@ -71,7 +71,7 @@
                 </div>
             </div>
             
-            <button type="submit">Crear Ticket</button>
+            <button type="submit" class="btn btn-primary">Crear Ticket</button>
         </form>
     </div>
 </body>

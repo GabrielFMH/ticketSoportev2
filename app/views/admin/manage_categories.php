@@ -19,7 +19,7 @@
     </div>
     
     <div class="container">
-        <div class="main-container">
+        <div class="wide-table-container">
             <div class="form-section">
                 <h2>Agregar Nueva Categoría</h2>
                 <?php if (isset($error)): ?>
@@ -41,16 +41,17 @@
                         <?php endforeach; ?>
                     </select>
                     
-                    <button type="submit">Agregar Categoría</button>
+                    <button type="submit" class="btn btn-primary">Agregar Categoría</button>
                 </form>
             </div>
-            
+
+
             <div class="list-section">
                 <h2>Categorías Existentes</h2>
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <!-- <th>ID</th> -->
                             <th>Nombre</th>
                             <th>Descripción</th>
                             <th>Departamento</th>
@@ -60,12 +61,12 @@
                     <tbody>
                         <?php foreach ($categories as $cat): ?>
                             <tr>
-                                <td><?php echo $cat['id']; ?></td>
+                                <!-- <td><?php echo $cat['id']; ?></td> -->
                                 <td><?php echo htmlspecialchars($cat['name']); ?></td>
                                 <td><?php echo htmlspecialchars(isset($cat['description']) ? $cat['description'] : 'N/A'); ?></td>
                                 <td><?php echo htmlspecialchars(isset($cat['dept_name']) ? $cat['dept_name'] : 'Ninguno'); ?></td>
                                 <td>
-                                    <span class="edit-link" onclick="toggleEdit(<?php echo $cat['id']; ?>)">Editar</span>
+                                    <span class="cancel-btn" onclick="toggleEdit(<?php echo $cat['id']; ?>)">Editar</span>
                                     <form method="POST" style="display: inline;" onsubmit="return confirm('¿Eliminar esta categoría?')">
                                         <input type="hidden" name="delete" value="1">
                                         <input type="hidden" name="id" value="<?php echo $cat['id']; ?>">
@@ -93,7 +94,7 @@
                                                 <?php endforeach; ?>
                                             </select>
                                             
-                                            <button type="submit">Guardar Cambios</button>
+                                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
                                             <button type="button" class="cancel-btn" onclick="toggleEdit(<?php echo $cat['id']; ?>)">Cancelar</button>
                                         </form>
                                     </div>
@@ -103,6 +104,8 @@
                     </tbody>
                 </table>
             </div>
+            
+            
         </div>
     </div>
     
