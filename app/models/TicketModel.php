@@ -20,11 +20,10 @@ class TicketModel {
         $impact = $data['impact'];
         $urgency = $data['urgency'];
         
-        // Get department from category
-        $dept_query = "SELECT department_id FROM categories WHERE id = ?";
+        // Get department from category using stored procedure
         $dept_params = array($category_id);
         $dept_params_ref = &$dept_params;
-        $dept_stmt = sqlsrv_prepare($this->db, $dept_query, $dept_params_ref);
+        $dept_stmt = sqlsrv_prepare($this->db, "EXEC sp_GetDepartmentFromCategory @category_id = ?", $dept_params_ref);
         if ($dept_stmt === false) {
             die('Error preparing dept query: ' . print_r(sqlsrv_errors(), true));
         }
@@ -33,11 +32,10 @@ class TicketModel {
         $department_id = $dept_row ? $dept_row['department_id'] : null;
         sqlsrv_free_stmt($dept_stmt);
         
-        // Insert ticket
-        $query = "INSERT INTO tickets (user_id, department_id, title, description, contact_info, category_id, priority_id, impact, urgency) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $params = array($user_id, $department_id, $title, $description, $contact_info, $category_id, $priority_id, $impact, $urgency);
+        // Create ticket using stored procedure
+        $params = array($user_id, $title, $description, $contact_info, $category_id, $priority_id, $impact, $urgency, $department_id);
         $params_ref = &$params;
-        $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
+        $stmt = sqlsrv_prepare($this->db, "EXEC sp_CreateTicket @user_id = ?, @title = ?, @description = ?, @contact_info = ?, @category_id = ?, @priority_id = ?, @impact = ?, @urgency = ?, @department_id = ?", $params_ref);
         if ($stmt === false) {
             die('Error preparing insert: ' . print_r(sqlsrv_errors(), true));
         }
@@ -47,8 +45,7 @@ class TicketModel {
         sqlsrv_free_stmt($stmt);
         
         // Get insert ID
-        $id_query = "SELECT SCOPE_IDENTITY() as id";
-        $id_stmt = sqlsrv_query($this->db, $id_query);
+        $id_stmt = sqlsrv_query($this->db, "SELECT SCOPE_IDENTITY() as id");
         if ($id_stmt === false) {
             die('Error getting ID: ' . print_r(sqlsrv_errors(), true));
         }
@@ -56,12 +53,11 @@ class TicketModel {
         $ticket_id = $id_row['id'];
         sqlsrv_free_stmt($id_stmt);
         
-        // Auto-assign: Find available agent in department (simple: first agent with <5 open tickets)
+        // Auto-assign: Find available agent in department using stored procedure
         if ($department_id) {
-            $agent_query = "SELECT u.id FROM users u WHERE u.role = 'agent' AND u.department_id = ? AND (SELECT COUNT(*) FROM tickets t WHERE t.assignee_id = u.id AND t.status != 'Cerrado') < 5";
             $agent_params = array($department_id);
             $agent_params_ref = &$agent_params;
-            $agent_stmt = sqlsrv_prepare($this->db, $agent_query, $agent_params_ref);
+            $agent_stmt = sqlsrv_prepare($this->db, "EXEC sp_GetAvailableAgent @department_id = ?", $agent_params_ref);
             if ($agent_stmt === false) {
                 die('Error preparing agent query: ' . print_r(sqlsrv_errors(), true));
             }
@@ -75,7 +71,7 @@ class TicketModel {
             }
         }
         
-        // Add to history
+        // Add to history using stored procedure
         $this->addHistory($ticket_id, 'Ticket creado por usuario', null, $user_id);
         
         // Trigger notification
@@ -85,10 +81,9 @@ class TicketModel {
     }
     
     public function getUserTickets($user_id) {
-        $query = "SELECT t.id, t.title, t.status, t.created_at FROM tickets t WHERE t.user_id = ? ORDER BY t.created_at DESC";
         $params = array($user_id);
         $params_ref = &$params;
-        $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
+        $stmt = sqlsrv_prepare($this->db, "EXEC sp_GetUserTickets @user_id = ?", $params_ref);
         if ($stmt === false) {
             return array();
         }
@@ -105,17 +100,9 @@ class TicketModel {
     }
     
     public function getTicketById($ticket_id) {
-        $query = "SELECT t.*, u.username as user_name, u.email as user_email, c.name as category_name, p.level as priority_level, a.username as assignee_name, d.name as department_name
-                  FROM tickets t
-                  LEFT JOIN users u ON t.user_id = u.id
-                  LEFT JOIN categories c ON t.category_id = c.id
-                  LEFT JOIN priorities p ON t.priority_id = p.id
-                  LEFT JOIN users a ON t.assignee_id = a.id
-                  LEFT JOIN departments d ON t.department_id = d.id
-                  WHERE t.id = ?";
         $params = array($ticket_id);
         $params_ref = &$params;
-        $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
+        $stmt = sqlsrv_prepare($this->db, "EXEC sp_GetTicketById @ticket_id = ?", $params_ref);
         if ($stmt === false) {
             return null;
         }
@@ -134,18 +121,14 @@ class TicketModel {
     }
     
     public function updateTicketStatus($ticket_id, $status, $notes, $user_id) {
-        // Update status
-        $query = "UPDATE tickets SET status = ?, updated_at = GETDATE() WHERE id = ?";
-        $params = array($status, $ticket_id);
+        // Update status using stored procedure
+        $params = array($ticket_id, $status, $user_id, $notes);
         $params_ref = &$params;
-        $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
+        $stmt = sqlsrv_prepare($this->db, "EXEC sp_UpdateTicketStatus @ticket_id = ?, @status = ?, @user_id = ?, @notes = ?", $params_ref);
         $success = ($stmt !== false && sqlsrv_execute($stmt) !== false);
         sqlsrv_free_stmt($stmt);
         
         if ($success) {
-            // Add to history
-            $this->addHistory($ticket_id, "Estado cambiado a: $status", $notes, $user_id);
-            
             // Trigger notification to user and assignee
             $ticket = $this->getTicketById($ticket_id);
             $user_email = isset($ticket['user_email']) ? $ticket['user_email'] : '';
@@ -161,14 +144,13 @@ class TicketModel {
     
     public function addHistory($ticket_id, $action, $notes, $user_id) {
         $ticket_id = (int)$ticket_id;
-        $action = $action;
+        //$action = $action;
         $notes = $notes ? $notes : null;
         $user_id = $user_id ? (int)$user_id : null;
         
-        $query = "INSERT INTO history (ticket_id, action, notes, user_id) VALUES (?, ?, ?, ?)";
         $params = array($ticket_id, $action, $notes, $user_id);
         $params_ref = &$params;
-        $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
+        $stmt = sqlsrv_prepare($this->db, "EXEC sp_AddHistory @ticket_id = ?, @action = ?, @notes = ?, @user_id = ?", $params_ref);
         if ($stmt !== false) {
             sqlsrv_execute($stmt);
         }
@@ -176,10 +158,9 @@ class TicketModel {
     }
     
     private function getTicketHistory($ticket_id) {
-        $query = "SELECT h.*, u.username FROM history h LEFT JOIN users u ON h.user_id = u.id WHERE h.ticket_id = ? ORDER BY h.timestamp ASC";
         $params = array($ticket_id);
         $params_ref = &$params;
-        $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
+        $stmt = sqlsrv_prepare($this->db, "EXEC sp_GetTicketHistory @ticket_id = ?", $params_ref);
         if ($stmt === false) {
             return array();
         }
@@ -200,28 +181,14 @@ class TicketModel {
         $agent_id = (int)$agent_id;
         $department_id = $department_id ? (int)$department_id : null;
         
-        // Update ticket assignee
-        $update_query = "UPDATE tickets SET assignee_id = ? WHERE id = ?";
-        $update_params = array($agent_id, $ticket_id);
-        $update_params_ref = &$update_params;
-        $update_stmt = sqlsrv_prepare($this->db, $update_query, $update_params_ref);
-        $update_success = ($update_stmt !== false && sqlsrv_execute($update_stmt) !== false);
-        sqlsrv_free_stmt($update_stmt);
+        // Assign ticket using stored procedure
+        $params = array($ticket_id, $agent_id, $department_id);
+        $params_ref = &$params;
+        $stmt = sqlsrv_prepare($this->db, "EXEC sp_AssignTicket @ticket_id = ?, @agent_id = ?, @department_id = ?", $params_ref);
+        $update_success = ($stmt !== false && sqlsrv_execute($stmt) !== false);
+        sqlsrv_free_stmt($stmt);
         
         if ($update_success) {
-            // Add assignment record
-            $assign_query = "INSERT INTO assignments (ticket_id, agent_id, department_id) VALUES (?, ?, ?)";
-            $assign_params = array($ticket_id, $agent_id, $department_id);
-            $assign_params_ref = &$assign_params;
-            $assign_stmt = sqlsrv_prepare($this->db, $assign_query, $assign_params_ref);
-            if ($assign_stmt !== false) {
-                sqlsrv_execute($assign_stmt);
-            }
-            sqlsrv_free_stmt($assign_stmt);
-            
-            // Add to history
-            $this->addHistory($ticket_id, 'Ticket asignado', null, $agent_id);
-            
             // Notify agent
             $agent_email = $this->getUserEmail($agent_id);
             $this->sendNotification($ticket_id, 'actualizacion', $agent_email);
@@ -231,8 +198,7 @@ class TicketModel {
     }
     
     public function getCategories() {
-        $query = "SELECT id, name FROM categories ORDER BY name";
-        $stmt = sqlsrv_query($this->db, $query);
+        $stmt = sqlsrv_query($this->db, "EXEC sp_GetCategories");
         if ($stmt === false) {
             return array();
         }
@@ -245,8 +211,7 @@ class TicketModel {
     }
     
     public function getPriorities() {
-        $query = "SELECT id, level, color FROM priorities ORDER BY id";
-        $stmt = sqlsrv_query($this->db, $query);
+        $stmt = sqlsrv_query($this->db, "EXEC sp_GetPriorities");
         if ($stmt === false) {
             return array();
         }
@@ -259,8 +224,7 @@ class TicketModel {
     }
     
     public function getDepartments() {
-        $query = "SELECT id, name FROM departments ORDER BY name";
-        $stmt = sqlsrv_query($this->db, $query);
+        $stmt = sqlsrv_query($this->db, "EXEC sp_GetAllDepartments");
         if ($stmt === false) {
             return array();
         }
@@ -273,10 +237,9 @@ class TicketModel {
     }
     
     private function getUserEmail($user_id) {
-        $query = "SELECT email FROM users WHERE id = ?";
         $params = array($user_id);
         $params_ref = &$params;
-        $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
+        $stmt = sqlsrv_prepare($this->db, "EXEC sp_GetUserEmail @user_id = ?", $params_ref);
         if ($stmt === false) {
             return '';
         }
@@ -296,11 +259,10 @@ class TicketModel {
         $subject = "Actualización de Ticket #$ticket_id - $type";
         $message = "Su ticket '" . $ticket['title'] . "' ha sido actualizado. Tipo: $type. Detalles: " . $ticket['description'];
         
-        // Log notification
-        $log_query = "INSERT INTO notifications (ticket_id, type, sent_to) VALUES (?, ?, ?)";
+        // Log notification using stored procedure
         $log_params = array($ticket_id, $type, $email);
         $log_params_ref = &$log_params;
-        $log_stmt = sqlsrv_prepare($this->db, $log_query, $log_params_ref);
+        $log_stmt = sqlsrv_prepare($this->db, "EXEC sp_LogNotification @ticket_id = ?, @type = ?, @sent_to = ?", $log_params_ref);
         if ($log_stmt !== false) {
             sqlsrv_execute($log_stmt);
         }

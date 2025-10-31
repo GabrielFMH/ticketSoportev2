@@ -14,10 +14,10 @@ class UserController {
             $username = $_POST['username'];
             $password = md5($_POST['password']); // Simple hash for PHP 5.5 compat
             
-            $query = "SELECT id, username, role FROM users WHERE username = ? AND password = ?";
+            // Use stored procedure for authentication
             $params = array($username, $password);
             $params_ref = &$params;
-            $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
+            $stmt = sqlsrv_prepare($this->db, "EXEC sp_AuthenticateUser @username = ?, @password = ?", $params_ref);
             if ($stmt === false) {
                 $error = 'Error preparing query: ' . print_r(sqlsrv_errors(), true);
             } else {
@@ -64,11 +64,10 @@ class UserController {
             if ($plain_password !== $confirm_password) {
                 $error = 'Las contraseñas no coinciden';
             } else {
-                // Check if user exists
-                $check_query = "SELECT id FROM users WHERE username = ? OR email = ?";
+                // Check if user exists using stored procedure
                 $check_params = array($username, $email);
                 $check_params_ref = &$check_params;
-                $check_stmt = sqlsrv_prepare($this->db, $check_query, $check_params_ref);
+                $check_stmt = sqlsrv_prepare($this->db, "EXEC sp_CheckUserExists @username = ?, @email = ?", $check_params_ref);
                 if ($check_stmt === false || sqlsrv_execute($check_stmt) === false) {
                     $error = 'Error checking user: ' . print_r(sqlsrv_errors(), true);
                 } else {
@@ -77,10 +76,10 @@ class UserController {
                     if ($existing) {
                         $error = 'Usuario o email ya existe';
                     } else {
-                        $query = "INSERT INTO users (username, email, password, role, department_id) VALUES (?, ?, ?, ?, ?)";
+                        // Create user using stored procedure
                         $params = array($username, $email, $password, $role, $department_id);
                         $params_ref = &$params;
-                        $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
+                        $stmt = sqlsrv_prepare($this->db, "EXEC sp_CreateUser @username = ?, @email = ?, @password = ?, @role = ?, @department_id = ?", $params_ref);
                         if ($stmt === false || sqlsrv_execute($stmt) === false) {
                             $error = 'Error al registrar: ' . print_r(sqlsrv_errors(), true);
                         } else {
@@ -114,17 +113,10 @@ class UserController {
         
         // Load user-specific data (e.g., tickets for user)
         if ($role === 'user') {
-            // Query user's tickets
-            $query = "SELECT t.id, t.title, t.description, t.contact_info, c.name AS category, p.level AS priority, t.status, u.username AS assignee, t.impact, t.urgency, t.created_at, t.updated_at
-                      FROM tickets t
-                      LEFT JOIN categories c ON t.category_id = c.id
-                      LEFT JOIN priorities p ON t.priority_id = p.id
-                      LEFT JOIN users u ON t.assignee_id = u.id
-                      WHERE t.user_id = ?
-                      ORDER BY t.created_at DESC";
+            // Get user's tickets using stored procedure
             $params = array($userId);
             $params_ref = &$params;
-            $stmt = sqlsrv_prepare($this->db, $query, $params_ref);
+            $stmt = sqlsrv_prepare($this->db, "EXEC sp_GetUserTickets @user_id = ?", $params_ref);
             if ($stmt === false || sqlsrv_execute($stmt) === false) {
                 $tickets = array();
             } else {

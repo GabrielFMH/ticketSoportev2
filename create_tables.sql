@@ -129,4 +129,344 @@ CREATE INDEX idx_tickets_department ON tickets(department_id);
 CREATE INDEX idx_tickets_assignee ON tickets(assignee_id);
 CREATE INDEX idx_users_role ON users(role);
 CREATE INDEX idx_users_department ON users(department_id);
+
+-- =============================================
+-- STORED PROCEDURES
+-- =============================================
+
+-- User Management Procedures
+CREATE PROCEDURE sp_AuthenticateUser
+    @username VARCHAR(50),
+    @password VARCHAR(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT id, username, role FROM users WHERE username = @username AND password = @password;
+END;
+GO
+
+CREATE PROCEDURE sp_CheckUserExists
+    @username VARCHAR(50),
+    @email VARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT id FROM users WHERE username = @username OR email = @email;
+END;
+GO
+
+CREATE PROCEDURE sp_CreateUser
+    @username VARCHAR(50),
+    @email VARCHAR(100),
+    @password VARCHAR(255),
+    @role VARCHAR(20),
+    @department_id INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    INSERT INTO users (username, email, password, role, department_id) VALUES (@username, @email, @password, @role, @department_id);
+    SELECT SCOPE_IDENTITY() as id;
+END;
+GO
+
+CREATE PROCEDURE sp_GetUserTickets
+    @user_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT t.id, t.title, t.description, t.contact_info, c.name AS category, p.level AS priority, t.status, u.username AS assignee, t.impact, t.urgency, t.created_at, t.updated_at
+    FROM tickets t
+    LEFT JOIN categories c ON t.category_id = c.id
+    LEFT JOIN priorities p ON t.priority_id = p.id
+    LEFT JOIN users u ON t.assignee_id = u.id
+    WHERE t.user_id = @user_id
+    ORDER BY t.created_at DESC;
+END;
+GO
+
+-- Category Management Procedures
+CREATE PROCEDURE sp_CreateCategory
+    @name VARCHAR(100),
+    @description NVARCHAR(MAX) = NULL,
+    @department_id INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    INSERT INTO categories (name, description, department_id) VALUES (@name, @description, @department_id);
+    SELECT SCOPE_IDENTITY() as id;
+END;
+GO
+
+CREATE PROCEDURE sp_UpdateCategory
+    @id INT,
+    @name VARCHAR(100),
+    @description NVARCHAR(MAX) = NULL,
+    @department_id INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE categories SET name = @name, description = @description, department_id = @department_id WHERE id = @id;
+END;
+GO
+
+CREATE PROCEDURE sp_DeleteCategory
+    @id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DELETE FROM categories WHERE id = @id;
+END;
+GO
+
+CREATE PROCEDURE sp_GetAllCategories
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT c.*, d.name as dept_name FROM categories c LEFT JOIN departments d ON c.department_id = d.id ORDER BY c.name;
+END;
+GO
+
+CREATE PROCEDURE sp_GetAllDepartments
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT id, name FROM departments ORDER BY name;
+END;
+GO
+
+-- Agent Management Procedures
+CREATE PROCEDURE sp_GetAgentDepartment
+    @agent_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT department_id FROM users WHERE id = @agent_id;
+END;
+GO
+
+CREATE PROCEDURE sp_GetAgentDepartmentTickets
+    @department_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT t.id, t.title, t.status, t.created_at, t.assignee_id, u.username as user_name 
+    FROM tickets t 
+    LEFT JOIN users u ON t.user_id = u.id 
+    WHERE t.department_id = @department_id 
+    ORDER BY t.created_at DESC;
+END;
+GO
+
+CREATE PROCEDURE sp_GetAdmin
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT id FROM users WHERE role = 'admin';
+END;
+GO
+
+-- Ticket Management Procedures
+CREATE PROCEDURE sp_GetDepartmentFromCategory
+    @category_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT department_id FROM categories WHERE id = @category_id;
+END;
+GO
+
+CREATE PROCEDURE sp_CreateTicket
+    @user_id INT,
+    @title VARCHAR(200),
+    @description NVARCHAR(MAX),
+    @contact_info VARCHAR(200),
+    @category_id INT,
+    @priority_id INT,
+    @impact NVARCHAR(MAX),
+    @urgency NVARCHAR(MAX),
+    @department_id INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    INSERT INTO tickets (user_id, department_id, title, description, contact_info, category_id, priority_id, impact, urgency) 
+    VALUES (@user_id, @department_id, @title, @description, @contact_info, @category_id, @priority_id, @impact, @urgency);
+    SELECT SCOPE_IDENTITY() as id;
+END;
+GO
+
+CREATE PROCEDURE sp_GetTicketById
+    @ticket_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT t.*, u.username as user_name, u.email as user_email, c.name as category_name, p.level as priority_level, a.username as assignee_name, d.name as department_name
+    FROM tickets t
+    LEFT JOIN users u ON t.user_id = u.id
+    LEFT JOIN categories c ON t.category_id = c.id
+    LEFT JOIN priorities p ON t.priority_id = p.id
+    LEFT JOIN users a ON t.assignee_id = a.id
+    LEFT JOIN departments d ON t.department_id = d.id
+    WHERE t.id = @ticket_id;
+END;
+GO
+
+CREATE PROCEDURE sp_GetTicketHistory
+    @ticket_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT h.*, u.username FROM history h LEFT JOIN users u ON h.user_id = u.id WHERE h.ticket_id = @ticket_id ORDER BY h.timestamp ASC;
+END;
+GO
+
+CREATE PROCEDURE sp_UpdateTicketStatus
+    @ticket_id INT,
+    @status VARCHAR(20),
+    @user_id INT,
+    @notes NVARCHAR(MAX) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE tickets SET status = @status, updated_at = GETDATE() WHERE id = @ticket_id;
+    
+    INSERT INTO history (ticket_id, action, notes, user_id) 
+    VALUES (@ticket_id, 'Estado cambiado a: ' + @status, @notes, @user_id);
+END;
+GO
+
+CREATE PROCEDURE sp_AddHistory
+    @ticket_id INT,
+    @action VARCHAR(255),
+    @notes NVARCHAR(MAX) = NULL,
+    @user_id INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    INSERT INTO history (ticket_id, action, notes, user_id) VALUES (@ticket_id, @action, @notes, @user_id);
+END;
+GO
+
+CREATE PROCEDURE sp_AssignTicket
+    @ticket_id INT,
+    @agent_id INT,
+    @department_id INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE tickets SET assignee_id = @agent_id WHERE id = @ticket_id;
+    
+    INSERT INTO assignments (ticket_id, agent_id, department_id) VALUES (@ticket_id, @agent_id, @department_id);
+    
+    INSERT INTO history (ticket_id, action, notes, user_id) 
+    VALUES (@ticket_id, 'Ticket asignado', NULL, @agent_id);
+END;
+GO
+
+CREATE PROCEDURE sp_GetAvailableAgent
+    @department_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT TOP 1 u.id 
+    FROM users u 
+    WHERE u.role = 'agent' 
+    AND u.department_id = @department_id 
+    AND (SELECT COUNT(*) FROM tickets t WHERE t.assignee_id = u.id AND t.status != 'Cerrado') < 5
+    ORDER BY u.id;
+END;
+GO
+
+CREATE PROCEDURE sp_GetUserEmail
+    @user_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT email FROM users WHERE id = @user_id;
+END;
+GO
+
+CREATE PROCEDURE sp_LogNotification
+    @ticket_id INT,
+    @type VARCHAR(20),
+    @sent_to VARCHAR(100),
+    @status VARCHAR(20) = 'enviado'
+AS
+BEGIN
+    SET NOCOUNT ON;
+    INSERT INTO notifications (ticket_id, type, sent_to, status) VALUES (@ticket_id, @type, @sent_to, @status);
+END;
+GO
+
+-- Report Procedures
+CREATE PROCEDURE sp_GetTicketsPerCategory
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT c.name as category, COUNT(t.id) as count 
+    FROM tickets t 
+    LEFT JOIN categories c ON t.category_id = c.id 
+    GROUP BY c.id, c.name 
+    ORDER BY count DESC;
+END;
+GO
+
+CREATE PROCEDURE sp_GetTicketsPerAgent
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT u.username as agent, COUNT(t.id) as count 
+    FROM tickets t 
+    LEFT JOIN users u ON t.assignee_id = u.id 
+    WHERE u.role = 'agent' 
+    GROUP BY u.id, u.username 
+    ORDER BY count DESC;
+END;
+GO
+
+CREATE PROCEDURE sp_GetTicketsPerDepartment
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT d.name as department, COUNT(t.id) as count 
+    FROM tickets t 
+    LEFT JOIN departments d ON t.department_id = d.id 
+    GROUP BY d.id, d.name 
+    ORDER BY count DESC;
+END;
+GO
+
+CREATE PROCEDURE sp_GetAverageResolutionTime
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT AVG(DATEDIFF(DAY, created_at, updated_at)) as avg_time 
+    FROM tickets 
+    WHERE status = 'Resuelto';
+END;
+GO
+
+CREATE PROCEDURE sp_GetTicketsByStatus
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT status, COUNT(id) as count FROM tickets GROUP BY status;
+END;
+GO
+
+-- Lookup Procedures
+CREATE PROCEDURE sp_GetCategories
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT id, name FROM categories ORDER BY name;
+END;
+GO
+
+CREATE PROCEDURE sp_GetPriorities
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT id, level, color FROM priorities ORDER BY id;
+END;
+GO
 GO

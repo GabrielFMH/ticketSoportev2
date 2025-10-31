@@ -33,10 +33,9 @@ class AdminController {
                 $name = $_POST['name'];
                 $description = $_POST['description'];
                 $dept_id = isset($_POST['department_id']) ? (int)$_POST['department_id'] : null;
-                $query = "INSERT INTO categories (name, description, department_id) VALUES (?, ?, ?)";
                 $params = array($name, $description, $dept_id);
                 $params_ref = &$params;
-                $stmt = sqlsrv_prepare($db, $query, $params_ref);
+                $stmt = sqlsrv_prepare($db, "EXEC sp_CreateCategory @name = ?, @description = ?, @department_id = ?", $params_ref);
                 if ($stmt === false || sqlsrv_execute($stmt) === false) {
                     $error = 'Error al agregar categoría: ' . print_r(sqlsrv_errors(), true);
                 }
@@ -46,20 +45,18 @@ class AdminController {
                 $name = $_POST['name'];
                 $description = $_POST['description'];
                 $dept_id = isset($_POST['department_id']) ? (int)$_POST['department_id'] : null;
-                $query = "UPDATE categories SET name = ?, description = ?, department_id = ? WHERE id = ?";
-                $params = array($name, $description, $dept_id, $id);
+                $params = array($id, $name, $description, $dept_id);
                 $params_ref = &$params;
-                $stmt = sqlsrv_prepare($db, $query, $params_ref);
+                $stmt = sqlsrv_prepare($db, "EXEC sp_UpdateCategory @id = ?, @name = ?, @description = ?, @department_id = ?", $params_ref);
                 if ($stmt === false || sqlsrv_execute($stmt) === false) {
                     $error = 'Error al editar categoría: ' . print_r(sqlsrv_errors(), true);
                 }
                 sqlsrv_free_stmt($stmt);
             } elseif (isset($_POST['delete'])) {
                 $id = (int)$_POST['id'];
-                $query = "DELETE FROM categories WHERE id = ?";
                 $params = array($id);
                 $params_ref = &$params;
-                $stmt = sqlsrv_prepare($db, $query, $params_ref);
+                $stmt = sqlsrv_prepare($db, "EXEC sp_DeleteCategory @id = ?", $params_ref);
                 if ($stmt === false || sqlsrv_execute($stmt) === false) {
                     $error = 'Error al eliminar categoría: ' . print_r(sqlsrv_errors(), true);
                 }
@@ -67,9 +64,8 @@ class AdminController {
             }
         }
         
-        // Get all categories
-        $categories_query = "SELECT c.*, d.name as dept_name FROM categories c LEFT JOIN departments d ON c.department_id = d.id ORDER BY c.name";
-        $categories_stmt = sqlsrv_query($db, $categories_query);
+        // Get all categories using stored procedure
+        $categories_stmt = sqlsrv_query($db, "EXEC sp_GetAllCategories");
         if ($categories_stmt === false) {
             $categories = array();
         } else {
@@ -80,9 +76,8 @@ class AdminController {
             sqlsrv_free_stmt($categories_stmt);
         }
         
-        // Get departments for form
-        $depts_query = "SELECT id, name FROM departments ORDER BY name";
-        $depts_stmt = sqlsrv_query($db, $depts_query);
+        // Get departments using stored procedure
+        $depts_stmt = sqlsrv_query($db, "EXEC sp_GetAllDepartments");
         if ($depts_stmt === false) {
             $departments = array();
         } else {

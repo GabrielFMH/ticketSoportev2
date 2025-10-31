@@ -164,11 +164,8 @@ class TicketController {
         if ($ticket_id) {
             // Find admin (role 'admin', any dept)
             $db = getDBConnection();
-            $admin_query = "SELECT id FROM users WHERE role = 'admin'";
-            $admin_params = array();
-            $admin_params_ref = &$admin_params;
-            $admin_stmt = sqlsrv_prepare($db, $admin_query, $admin_params_ref);
-            if ($admin_stmt === false || sqlsrv_execute($admin_stmt) === false) {
+            $admin_stmt = sqlsrv_query($db, "EXEC sp_GetAdmin");
+            if ($admin_stmt === false) {
                 closeDBConnection($db);
                 header("Location: ?controller=ticket&action=view&id=$ticket_id");
                 exit;
