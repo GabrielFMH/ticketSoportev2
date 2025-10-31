@@ -64,7 +64,7 @@
                                     <button type="submit" class="btn btn-primary">Cambiar</button>
                                 </form>
                                 <?php endif; ?>
-                                <a href="?controller=ticket&action=view&id=<?php echo $ticket['id']; ?>" class="btn btn-primary">Ver/Actualizar</a>
+                                <br><br><a href="?controller=ticket&action=view&id=<?php echo $ticket['id']; ?>">Ver/Actualizar</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
