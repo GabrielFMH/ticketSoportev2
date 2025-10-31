@@ -461,6 +461,138 @@ input:required:valid {
 }
 
 /* ========================================
+   TABLE ACTION COLUMNS FIXES
+   ======================================== */
+
+/* Make action column wider automatically for better button layout */
+.table th:last-child,
+.tickets-table th:last-child,
+.report-table th:last-child {
+    min-width: 160px;
+    text-align: center;
+}
+
+.table td:last-child,
+.tickets-table td:last-child,
+.report-table td:last-child {
+    min-width: 160px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Use flexbox for better button alignment in action columns */
+.table td:last-child,
+.tickets-table td:last-child,
+.report-table td:last-child {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Make buttons smaller in table context for better fit */
+.table td:last-child .btn,
+.table td:last-child .cancel-btn,
+.table td:last-child .delete-btn,
+.table td:last-child button {
+    padding: 6px 12px;
+    font-size: 14px;
+    white-space: nowrap;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+/* Ensure forms display inline in action columns */
+.table td:last-child form,
+.tickets-table td:last-child form,
+.report-table td:last-child form {
+    display: inline;
+    margin: 0;
+}
+
+/* Special styling for action buttons in admin panels */
+.table td:last-child .cancel-btn {
+    background: #6C757D;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 6px 12px;
+    transition: all 0.3s;
+}
+
+.table td:last-child .delete-btn {
+    background: #DC3545;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 6px 12px;
+    transition: all 0.3s;
+}
+
+/* Fix for user dashboard table action column alignment */
+.tickets-table td.actions {
+    display: flex !important;
+    flex-wrap: nowrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 180px;
+    vertical-align: middle;
+}
+
+.tickets-table td.actions .btn {
+    padding: 6px 12px;
+    font-size: 14px;
+    white-space: nowrap;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+/* Ensure table rows maintain proper height and alignment */
+.tickets-table tr {
+    height: auto;
+}
+
+.tickets-table td {
+    vertical-align: middle;
+    line-height: 1.4;
+}
+
+/* Responsive table actions */
+@media (max-width: 768px) {
+    .table td:last-child,
+    .tickets-table td:last-child,
+    .report-table td:last-child {
+        min-width: 120px;
+        gap: 4px;
+    }
+    
+    .table td:last-child .btn,
+    .table td:last-child .cancel-btn,
+    .table td:last-child .delete-btn {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+    
+    .tickets-table td.actions {
+        gap: 4px;
+        min-width: 140px;
+    }
+    
+    .tickets-table td.actions .btn {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+}
+
+/* ========================================
    RESPONSIVE COMPONENTS
    ======================================== */
 

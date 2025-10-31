@@ -37,7 +37,7 @@
                         <!-- <th>Asignado a</th>
                         <th>Impacto</th>
                         <th>Urgencia</th> -->
-                        <th>Fecha de Creación</th>
+                        <!-- <th>Fecha de Creación</th> -->
                         <th>Última Actualización</th>
                         <th>Acciones</th>
                     </tr>
@@ -55,10 +55,10 @@
                             <!-- <td><?php echo htmlspecialchars($ticket['assignee'] ?? 'No asignado'); ?></td>
                             <td><?php echo htmlspecialchars($ticket['impact'] ?? 'N/A'); ?></td>
                             <td><?php echo htmlspecialchars($ticket['urgency'] ?? 'N/A'); ?></td> -->
-                            <td><?php echo $ticket['created_at'] ? $ticket['created_at']->format('d/m/Y H:i') : 'N/A'; ?></td>
+                            <!-- <td><?php echo $ticket['created_at'] ? $ticket['created_at']->format('d/m/Y H:i') : 'N/A'; ?></td> -->
                             <td><?php echo $ticket['updated_at'] ? $ticket['updated_at']->format('d/m/Y H:i') : 'N/A'; ?></td>
                             <td class="actions">
-                                <a href="?controller=ticket&action=view&id=<?php echo $ticket['id']; ?>" class="btn btn-primary">Ver Detalles</a><br>
+                                <a href="?controller=ticket&action=view&id=<?php echo $ticket['id']; ?>" class="btn btn-primary">Detalles</a>
                                 <?php if ($ticket['status'] === 'Abierto'): ?>
                                     <a href="?controller=ticket&action=cancel&id=<?php echo $ticket['id']; ?>"
                                        onclick="return confirm('¿Estás seguro de que deseas cancelar este ticket?');"
