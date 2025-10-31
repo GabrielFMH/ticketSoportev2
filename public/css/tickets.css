@@ -1,0 +1,339 @@
+/* ========================================
+   TICKET VIEWS STYLES
+   ======================================== */
+
+/* ========================================
+   TICKET DETAILS VIEW
+   ======================================== */
+
+.ticket-details .detail-row {
+    display: flex;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.ticket-details .detail-label {
+    font-weight: bold;
+    width: 150px;
+    color: #007BFF;
+    font-size: 16px;
+}
+
+.ticket-details .detail-value {
+    flex: 1;
+    padding: 8px;
+    background: #F8F9FA;
+    border-radius: 8px;
+    border-left: 4px solid #007BFF;
+}
+
+/* ========================================
+   TICKET HISTORY
+   ======================================== */
+
+.history h3 {
+    color: #007BFF;
+    margin-top: 0;
+    font-size: 24px;
+    border-bottom: 2px solid #007BFF;
+    padding-bottom: 10px;
+}
+
+.history-item {
+    background: #F8F9FA;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #007BFF;
+    border-radius: 8px;
+    transition: box-shadow 0.3s;
+}
+
+.history-item:hover {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.history-item .action {
+    font-weight: bold;
+    color: #007BFF;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.history-item .notes {
+    margin-top: 5px;
+    color: #6C757D;
+    background: #FFFFFF;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.history-item .timestamp {
+    font-size: 12px;
+    color: #999;
+    margin-top: 10px;
+    font-style: italic;
+}
+
+/* ========================================
+   TICKET CREATION FORM
+   ======================================== */
+
+.ticket-create .form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.ticket-create .form-row .form-group {
+    flex: 1;
+}
+
+.ticket-create label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+.ticket-create input[type="text"],
+.ticket-create input[type="email"],
+.ticket-create textarea,
+.ticket-create select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #DDD;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+}
+
+.ticket-create textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+.ticket-create button {
+    width: 100%;
+    padding: 12px;
+    background: #007BFF;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.ticket-create button:hover {
+    background: #0056b3;
+}
+
+/* ========================================
+   TICKET STATUS & ACTIONS
+   ======================================== */
+
+.status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    color: #FFFFFF;
+    font-weight: bold;
+    font-size: 14px;
+    display: inline-block;
+}
+
+.status-abierto {
+    background: #007BFF;
+}
+
+.status-en-progreso {
+    background: #FFC107;
+    color: #000;
+}
+
+.status-resuelto {
+    background: #28A745;
+}
+
+.status-cerrado {
+    background: #6C757D;
+}
+
+/* Ticket actions in tables */
+.tickets-table .actions a {
+    color: #007BFF;
+    text-decoration: none;
+    padding: 8px 16px;
+    border: 1px solid #007BFF;
+    border-radius: 20px;
+    transition: all 0.3s;
+    margin-right: 5px;
+}
+
+.tickets-table .actions a:hover {
+    background: #007BFF;
+    color: #FFFFFF;
+    transform: translateY(-2px);
+}
+
+.tickets-table .actions a[style*="color: #DC3545"] {
+    color: #DC3545 !important;
+    border-color: #DC3545 !important;
+}
+
+.tickets-table .actions a[style*="color: #DC3545"]:hover {
+    background: #DC3545 !important;
+    color: #FFFFFF !important;
+}
+
+/* ========================================
+   TICKET UPDATE FORMS
+   ======================================== */
+
+.update-form label {
+    display: block;
+    margin: 15px 0 5px;
+    font-weight: bold;
+    color: #495057;
+}
+
+.update-form input[type="hidden"],
+.update-form select,
+.update-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #DEE2E6;
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.update-form textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+/* ========================================
+   DASHBOARD TICKETS TABLE
+   ======================================== */
+
+.user-dashboard .tickets-table,
+.agent-dashboard .tickets-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    table-layout: fixed;
+}
+
+.user-dashboard .tickets-table th,
+.user-dashboard .tickets-table td,
+.agent-dashboard .tickets-table th,
+.agent-dashboard .tickets-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #DDD;
+    word-wrap: break-word;
+}
+
+.user-dashboard .tickets-table th,
+.agent-dashboard .tickets-table th {
+    background: #F8F9FA;
+    color: #495057;
+}
+
+.user-dashboard .tickets-table tr:hover,
+.agent-dashboard .tickets-table tr:hover {
+    background: #F8F9FA;
+}
+
+/* No tickets message */
+.no-tickets {
+    text-align: center;
+    color: #6C757D;
+    padding: 40px;
+}
+
+.user-dashboard .no-tickets {
+    text-align: center;
+    color: #6C757D;
+    padding: 40px;
+}
+
+.agent-dashboard .no-tickets {
+    text-align: center;
+    color: #6C757D;
+    padding: 60px;
+    background: #FFFFFF;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    margin-top: 20px;
+}
+
+/* ========================================
+   TICKET METRICS & ANALYTICS
+   ======================================== */
+
+.ticket-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.metric-card .metric-icon {
+    font-size: 40px;
+    color: #007BFF;
+    margin-bottom: 10px;
+}
+
+.metric-card .metric-value {
+    font-size: 2.5em;
+    color: #007BFF;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.metric-card .metric-label {
+    color: #6C757D;
+    font-size: 16px;
+}
+
+/* ========================================
+   RESPONSIVE TICKET STYLES
+   ======================================== */
+
+@media (max-width: 768px) {
+    .ticket-details .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .ticket-details .detail-label {
+        width: auto;
+        margin-bottom: 5px;
+    }
+    
+    .ticket-create .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .tickets-table {
+        font-size: 14px;
+    }
+    
+    .tickets-table th,
+    .tickets-table td {
+        padding: 10px;
+    }
+    
+    .button-group {
+        flex-direction: column;
+    }
+    
+    .actions a {
+        display: block;
+        text-align: center;
+        margin-bottom: 5px;
+    }
+}

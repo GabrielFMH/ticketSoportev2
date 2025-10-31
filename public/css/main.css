@@ -1,0 +1,89 @@
+/* ========================================
+   TICKET SUPPORT SYSTEM - MAIN STYLESHEET
+   ======================================== */
+
+/* Import all CSS modules */
+@import url('base.css');
+@import url('components.css');
+@import url('layout.css');
+@import url('auth.css');
+@import url('tickets.css');
+
+/* ========================================
+   ADDITIONAL GLOBAL STYLES
+   ======================================== */
+
+/* Ensure consistent box-sizing across all elements */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Smooth scrolling for better UX */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Focus indicators for accessibility */
+*:focus {
+    outline: 2px solid #007BFF;
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .header,
+    .nav,
+    .logout,
+    .actions,
+    .button-group {
+        display: none;
+    }
+    
+    .container {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .tickets-table,
+    .table,
+    .report-table {
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+    
+    .status {
+        border: 1px solid #000;
+        color: #000 !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .btn {
+        border: 2px solid currentColor;
+    }
+    
+    .tickets-table th {
+        background: #000 !important;
+        color: #fff !important;
+    }
+    
+    .status {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Dark mode support (for future implementation) */
+@media (prefers-color-scheme: dark) {
+    /* Dark mode styles can be added here in the future */
+}

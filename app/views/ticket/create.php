@@ -4,29 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear Ticket - Sistema de Tickets</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #FFFFFF; color: #333; margin: 0; padding: 20px; }
-        .header { background: #007BFF; color: #FFFFFF; padding: 15px; border-radius: 4px 4px 0 0; margin-bottom: 20px; }
-        .header h1 { margin: 0; }
-        .nav { margin-bottom: 20px; }
-        .nav a { background: #007BFF; color: #FFFFFF; padding: 10px 15px; text-decoration: none; border-radius: 4px; margin-right: 10px; }
-        .nav a:hover { background: #0056b3; }
-        .logout { float: right; background: #6C757D; }
-        .logout:hover { background: #545B62; }
-        .form-container { background: #FFFFFF; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 800px; margin: 0 auto; }
-        h2 { color: #007BFF; margin-bottom: 20px; }
-        label { display: block; margin: 10px 0 5px; font-weight: bold; }
-        input[type="text"], input[type="email"], textarea, select { width: 100%; padding: 10px; border: 1px solid #DDD; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; }
-        textarea { height: 120px; resize: vertical; }
-        button { width: 100%; padding: 12px; background: #007BFF; color: #FFFFFF; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-        button:hover { background: #0056b3; }
-        .error, .success { text-align: center; margin: 10px 0; padding: 10px; border-radius: 4px; }
-        .error { color: #DC3545; background: #F8D7DA; }
-        .success { color: #155724; background: #D4EDDA; }
-        .form-row { display: flex; gap: 20px; }
-        .form-row .form-group { flex: 1; }
-        @media (max-width: 768px) { .form-row { flex-direction: column; } }
-    </style>
+    <link href="css/main.css" rel="stylesheet">
 </head>
 <body>
     <div class="header">
