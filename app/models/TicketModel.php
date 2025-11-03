@@ -152,6 +152,104 @@ class TicketModel {
         return $success;
     }
     
+    public function updateTicketDetails($ticket_id, $category_id = null, $priority_id = null, $impact = null, $urgency = null) {
+        try {
+            $ticket_id = (int)$ticket_id;
+            $category_id = $category_id ? (int)$category_id : null;
+            $priority_id = $priority_id ? (int)$priority_id : null;
+            $impact = $impact ? $impact : null;
+            $urgency = $urgency ? $urgency : null;
+            
+            // Check if any values actually changed
+            $current_ticket = $this->getTicketById($ticket_id);
+            if (!$current_ticket) {
+                return false;
+            }
+            
+            $has_changes = false;
+            $change_log = array();
+            
+            if ($category_id && $category_id != $current_ticket['category_id']) {
+                $has_changes = true;
+                $change_log[] = 'Categoría';
+            }
+            if ($priority_id && $priority_id != $current_ticket['priority_id']) {
+                $has_changes = true;
+                $change_log[] = 'Prioridad';
+            }
+            if ($impact && $impact != $current_ticket['impact']) {
+                $has_changes = true;
+                $change_log[] = 'Impacto';
+            }
+            if ($urgency && $urgency != $current_ticket['urgency']) {
+                $has_changes = true;
+                $change_log[] = 'Urgencia';
+            }
+            
+            if (!$has_changes) {
+                return true; // No changes needed
+            }
+            
+            // Try stored procedure first
+            $params = array($ticket_id, $category_id, $priority_id, $impact, $urgency);
+            $params_ref = &$params;
+            $stmt = sqlsrv_prepare($this->db, "EXEC sp_UpdateTicketDetails @ticket_id = ?, @category_id = ?, @priority_id = ?, @impact = ?, @urgency = ?", $params_ref);
+            
+            if ($stmt !== false && sqlsrv_execute($stmt) !== false) {
+                sqlsrv_free_stmt($stmt);
+                // Add history entry
+                $this->addHistory($ticket_id, 'Detalles del ticket actualizados: ' . implode(', ', $change_log), null, $_SESSION['user_id']);
+                return true;
+            } else {
+                sqlsrv_free_stmt($stmt);
+                
+                // Fallback to manual UPDATE if stored procedure doesn't exist
+                $update_parts = array();
+                $update_params = array();
+                
+                if ($category_id) {
+                    $update_parts[] = "category_id = ?";
+                    $update_params[] = $category_id;
+                }
+                if ($priority_id) {
+                    $update_parts[] = "priority_id = ?";
+                    $update_params[] = $priority_id;
+                }
+                if ($impact) {
+                    $update_parts[] = "impact = ?";
+                    $update_params[] = $impact;
+                }
+                if ($urgency) {
+                    $update_parts[] = "urgency = ?";
+                    $update_params[] = $urgency;
+                }
+                
+                if (!empty($update_parts)) {
+                    $update_params[] = $ticket_id;
+                    $update_params_ref = &$update_params;
+                    
+                    $update_query = "UPDATE tickets SET " . implode(', ', $update_parts) . " WHERE id = ?";
+                    $update_stmt = sqlsrv_prepare($this->db, $update_query, $update_params_ref);
+                    
+                    if ($update_stmt !== false && sqlsrv_execute($update_stmt) !== false) {
+                        sqlsrv_free_stmt($update_stmt);
+                        // Add history entry
+                        $this->addHistory($ticket_id, 'Detalles del ticket actualizados (manual): ' . implode(', ', $change_log), null, $_SESSION['user_id']);
+                        return true;
+                    } else {
+                        sqlsrv_free_stmt($update_stmt);
+                        return false;
+                    }
+                }
+            }
+            
+            return false;
+        } catch (Exception $e) {
+            error_log("Error in updateTicketDetails: " . $e->getMessage());
+            return false;
+        }
+    }
+    
     public function addHistory($ticket_id, $action, $notes, $user_id) {
         $ticket_id = (int)$ticket_id;
         //$action = $action;

@@ -66,29 +66,62 @@ class TicketController {
             exit;
         }
         
+        // Load options for form (only needed for agents/admins)
+        if (in_array($role, ['agent', 'admin'])) {
+            $categories = $this->model->getCategories();
+            $priorities = $this->model->getPriorities();
+        } else {
+            // Initialize empty arrays to avoid undefined variable errors
+            $categories = array();
+            $priorities = array();
+        }
+        
         include '../app/views/ticket/view.php';
     }
     
     public function update() {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] === 'user') {
-            header('Location: ?controller=user&action=dashboard');
-            exit;
-        }
-        
-        $ticket_id = isset($_POST['ticket_id']) ? (int)$_POST['ticket_id'] : 0;
-        $status = $_POST['status'];
-        $notes = $_POST['notes'];
-        $user_id = $_SESSION['user_id'];
-        
-        if ($ticket_id && in_array($status, ['Abierto', 'En Progreso', 'Resuelto', 'Cerrado'])) {
-            $success = $this->model->updateTicketStatus($ticket_id, $status, $notes, $user_id);
-            if ($success) {
-                $message = 'Ticket actualizado exitosamente';
-            } else {
-                $error = 'Error al actualizar el ticket';
+        try {
+            if (!isset($_SESSION['user_id']) || $_SESSION['role'] === 'user') {
+                header('Location: ?controller=user&action=dashboard');
+                exit;
             }
-        } else {
-            $error = 'Datos inválidos';
+            
+            $ticket_id = isset($_POST['ticket_id']) ? (int)$_POST['ticket_id'] : 0;
+            $status = $_POST['status'];
+            $notes = isset($_POST['notes']) ? $_POST['notes'] : '';
+            $user_id = $_SESSION['user_id'];
+            
+            // Only agents/admins can update these fields
+            $category_id = isset($_POST['category_id']) ? (int)$_POST['category_id'] : null;
+            $priority_id = isset($_POST['priority_id']) ? (int)$_POST['priority_id'] : null;
+            $impact = isset($_POST['impact']) ? $_POST['impact'] : null;
+            $urgency = isset($_POST['urgency']) ? $_POST['urgency'] : null;
+            
+            if ($ticket_id && in_array($status, ['Abierto', 'En Progreso', 'Resuelto', 'Cerrado'])) {
+                // Update basic status
+                $success = $this->model->updateTicketStatus($ticket_id, $status, $notes, $user_id);
+                
+                // Update additional fields if provided (for agents/admins only)
+                if (in_array($_SESSION['role'], ['agent', 'admin']) && ($category_id || $priority_id || $impact || $urgency)) {
+                    try {
+                        $this->model->updateTicketDetails($ticket_id, $category_id, $priority_id, $impact, $urgency);
+                    } catch (Exception $e) {
+                        // Log error but don't fail the whole update
+                        error_log("Error updating ticket details: " . $e->getMessage());
+                    }
+                }
+                
+                if ($success) {
+                    $message = 'Ticket actualizado exitosamente';
+                } else {
+                    $error = 'Error al actualizar el estado del ticket';
+                }
+            } else {
+                $error = 'Datos inválidos';
+            }
+        } catch (Exception $e) {
+            error_log("Error in ticket update: " . $e->getMessage());
+            $error = 'Error interno del servidor al actualizar el ticket';
         }
         
         // Redirect back to view

@@ -112,6 +112,7 @@
                 <h3>Actualizar Ticket</h3>
                 <form method="POST" action="?controller=ticket&action=update">
                     <input type="hidden" name="ticket_id" value="<?php echo $ticket['id']; ?>">
+                    
                     <label for="status">Nuevo Estado:</label>
                     <select name="status" required>
                         <option value="">Seleccione estado</option>
@@ -120,6 +121,45 @@
                         <option value="Resuelto" <?php echo $ticket['status'] === 'Resuelto' ? 'selected' : ''; ?>>Resuelto</option>
                         <option value="Cerrado" <?php echo $ticket['status'] === 'Cerrado' ? 'selected' : ''; ?>>Cerrado</option>
                     </select>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="category_id">Categoría:</label>
+                            <select id="category_id" name="category_id">
+                                <?php foreach ($categories as $cat): ?>
+                                    <option value="<?php echo $cat['id']; ?>" <?php echo ($cat['id'] == $ticket['category_id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($cat['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority_id">Prioridad:</label>
+                            <select id="priority_id" name="priority_id">
+                                <?php foreach ($priorities as $pri): ?>
+                                    <option value="<?php echo $pri['id']; ?>" <?php echo ($pri['id'] == $ticket['priority_id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($pri['level']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="impact">Impacto:</label>
+                            <select id="impact" name="impact">
+                                <option value="Bajo" <?php echo ($ticket['impact'] == 'Bajo') ? 'selected' : ''; ?>>Bajo</option>
+                                <option value="Medio" <?php echo ($ticket['impact'] == 'Medio') ? 'selected' : ''; ?>>Medio</option>
+                                <option value="Alto" <?php echo ($ticket['impact'] == 'Alto') ? 'selected' : ''; ?>>Alto</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="urgency">Urgencia:</label>
+                            <select id="urgency" name="urgency">
+                                <option value="Baja" <?php echo ($ticket['urgency'] == 'Baja') ? 'selected' : ''; ?>>Baja</option>
+                                <option value="Media" <?php echo ($ticket['urgency'] == 'Media') ? 'selected' : ''; ?>>Media</option>
+                                <option value="Alta" <?php echo ($ticket['urgency'] == 'Alta') ? 'selected' : ''; ?>>Alta</option>
+                            </select>
+                        </div>
+                    </div>
+                    
                     <label for="notes">Notas Internas:</label>
                     <textarea name="notes" placeholder="Agregue notas o comentarios..."></textarea>
                     <div class="button-group">
