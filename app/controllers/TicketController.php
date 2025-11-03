@@ -142,7 +142,12 @@ class TicketController {
         
         $ticket_id = isset($_POST['ticket_id']) ? (int)$_POST['ticket_id'] : 0;
         if ($ticket_id) {
+            // First assign the ticket to the agent
             $this->model->assignTicket($ticket_id, $_SESSION['user_id']);
+            
+            // Then update status to "En Progreso"
+            $this->model->updateTicketStatus($ticket_id, 'En Progreso', 'Ticket aceptado por agente', $_SESSION['user_id']);
+            
             header("Location: ?controller=ticket&action=view&id=$ticket_id");
             exit;
         }
