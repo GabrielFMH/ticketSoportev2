@@ -10,30 +10,18 @@ class TicketModel {
     }
     
     public function createTicket($data) {
-        // $data: array with user_id, title, description, contact_info, category_id, priority_id, impact, urgency, department_id
+        // $data: array with user_id, title, description, contact_info, department_id
         $user_id = (int)$data['user_id'];
         $title = $data['title'];
         $description = $data['description'];
         $contact_info = $data['contact_info'];
-        $category_id = (int)$data['category_id'];
-        $priority_id = (int)$data['priority_id'];
-        $impact = $data['impact'];
-        $urgency = $data['urgency'];
         $department_id = isset($data['department_id']) ? $data['department_id'] : null;
         
-        // If no department selected by user, get department from category using stored procedure
-        if (!$department_id) {
-            $dept_params = array($category_id);
-            $dept_params_ref = &$dept_params;
-            $dept_stmt = sqlsrv_prepare($this->db, "EXEC sp_GetDepartmentFromCategory @category_id = ?", $dept_params_ref);
-            if ($dept_stmt === false) {
-                die('Error preparing dept query: ' . print_r(sqlsrv_errors(), true));
-            }
-            sqlsrv_execute($dept_stmt);
-            $dept_row = sqlsrv_fetch_array($dept_stmt, SQLSRV_FETCH_ASSOC);
-            $department_id = $dept_row ? $dept_row['department_id'] : null;
-            sqlsrv_free_stmt($dept_stmt);
-        }
+        // For simplified form, use default values for required fields
+        $category_id = 1; // Default category
+        $priority_id = 1; // Default priority
+        $impact = 'Medio'; // Default impact
+        $urgency = 'Media'; // Default urgency
         
         // Create ticket using stored procedure
         $params = array($user_id, $title, $description, $contact_info, $category_id, $priority_id, $impact, $urgency, $department_id);

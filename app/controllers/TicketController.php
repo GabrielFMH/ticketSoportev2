@@ -22,10 +22,6 @@ class TicketController {
                 'title' => $_POST['title'],
                 'description' => $_POST['description'],
                 'contact_info' => $_POST['contact_info'],
-                'category_id' => (int)$_POST['category_id'],
-                'priority_id' => (int)$_POST['priority_id'],
-                'impact' => $_POST['impact'],
-                'urgency' => $_POST['urgency'],
                 'department_id' => !empty($_POST['department_id']) ? (int)$_POST['department_id'] : null
             );
             
