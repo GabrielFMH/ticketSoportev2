@@ -235,6 +235,52 @@ BEGIN
 END;
 GO
 
+-- Department Management Procedures
+CREATE PROCEDURE sp_CreateDepartment
+    @name VARCHAR(100),
+    @description NVARCHAR(MAX) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    INSERT INTO departments (name, description) VALUES (@name, @description);
+    SELECT SCOPE_IDENTITY() as id;
+END;
+GO
+
+CREATE PROCEDURE sp_UpdateDepartment
+    @id INT,
+    @name VARCHAR(100),
+    @description NVARCHAR(MAX) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE departments SET name = @name, description = @description WHERE id = @id;
+END;
+GO
+
+CREATE PROCEDURE sp_DeleteDepartment
+    @id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DELETE FROM departments WHERE id = @id;
+END;
+GO
+
+CREATE PROCEDURE sp_GetDepartmentsWithAgentCount
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT
+        d.*,
+        COUNT(u.id) as agent_count
+    FROM departments d
+    LEFT JOIN users u ON d.id = u.department_id AND u.role = 'agent'
+    GROUP BY d.id, d.name, d.description, d.created_at
+    ORDER BY d.name;
+END;
+GO
+
 -- Agent Management Procedures
 CREATE PROCEDURE sp_GetAgentDepartment
     @agent_id INT
@@ -478,11 +524,11 @@ CREATE PROCEDURE sp_GetRecentTicketUpdates
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT TOP (@limit) 
+    SELECT TOP (@limit)
         t.id as ticket_id,
         t.title,
         h.action,
-        h.timestamp as created_at,  -- <-- ESTAS LÍNEAS DEBEN IR JUNTAS
+        h.timestamp as created_at,
         t.status
     FROM tickets t
     INNER JOIN history h ON t.id = h.ticket_id

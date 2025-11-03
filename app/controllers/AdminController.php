@@ -24,60 +24,52 @@ class AdminController {
         include '../app/views/admin/dashboard.php';
     }
     
-    // Customization: Manage categories
-    public function manageCategories() {
+    // Customization: Manage departments
+    public function manageDepartments() {
         $db = getDBConnection();
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_POST['add'])) {
                 $name = $_POST['name'];
                 $description = $_POST['description'];
-                $dept_id = isset($_POST['department_id']) ? (int)$_POST['department_id'] : null;
-                $params = array($name, $description, $dept_id);
+                $params = array($name, $description);
                 $params_ref = &$params;
-                $stmt = sqlsrv_prepare($db, "EXEC sp_CreateCategory @name = ?, @description = ?, @department_id = ?", $params_ref);
+                $stmt = sqlsrv_prepare($db, "EXEC sp_CreateDepartment @name = ?, @description = ?", $params_ref);
                 if ($stmt === false || sqlsrv_execute($stmt) === false) {
-                    $error = 'Error al agregar categoría: ' . print_r(sqlsrv_errors(), true);
+                    $error = 'Error al agregar departamento: ' . print_r(sqlsrv_errors(), true);
+                } else {
+                    $success = 'Departamento agregado correctamente.';
                 }
                 sqlsrv_free_stmt($stmt);
             } elseif (isset($_POST['edit'])) {
                 $id = (int)$_POST['id'];
                 $name = $_POST['name'];
                 $description = $_POST['description'];
-                $dept_id = isset($_POST['department_id']) ? (int)$_POST['department_id'] : null;
-                $params = array($id, $name, $description, $dept_id);
+                $params = array($id, $name, $description);
                 $params_ref = &$params;
-                $stmt = sqlsrv_prepare($db, "EXEC sp_UpdateCategory @id = ?, @name = ?, @description = ?, @department_id = ?", $params_ref);
+                $stmt = sqlsrv_prepare($db, "EXEC sp_UpdateDepartment @id = ?, @name = ?, @description = ?", $params_ref);
                 if ($stmt === false || sqlsrv_execute($stmt) === false) {
-                    $error = 'Error al editar categoría: ' . print_r(sqlsrv_errors(), true);
+                    $error = 'Error al editar departamento: ' . print_r(sqlsrv_errors(), true);
+                } else {
+                    $success = 'Departamento actualizado correctamente.';
                 }
                 sqlsrv_free_stmt($stmt);
             } elseif (isset($_POST['delete'])) {
                 $id = (int)$_POST['id'];
                 $params = array($id);
                 $params_ref = &$params;
-                $stmt = sqlsrv_prepare($db, "EXEC sp_DeleteCategory @id = ?", $params_ref);
+                $stmt = sqlsrv_prepare($db, "EXEC sp_DeleteDepartment @id = ?", $params_ref);
                 if ($stmt === false || sqlsrv_execute($stmt) === false) {
-                    $error = 'Error al eliminar categoría: ' . print_r(sqlsrv_errors(), true);
+                    $error = 'Error al eliminar departamento: ' . print_r(sqlsrv_errors(), true);
+                } else {
+                    $success = 'Departamento eliminado correctamente.';
                 }
                 sqlsrv_free_stmt($stmt);
             }
         }
         
-        // Get all categories using stored procedure
-        $categories_stmt = sqlsrv_query($db, "EXEC sp_GetAllCategories");
-        if ($categories_stmt === false) {
-            $categories = array();
-        } else {
-            $categories = array();
-            while ($row = sqlsrv_fetch_array($categories_stmt, SQLSRV_FETCH_ASSOC)) {
-                $categories[] = $row;
-            }
-            sqlsrv_free_stmt($categories_stmt);
-        }
-        
-        // Get departments using stored procedure
-        $depts_stmt = sqlsrv_query($db, "EXEC sp_GetAllDepartments");
+        // Get all departments using stored procedure with agent count
+        $depts_stmt = sqlsrv_query($db, "EXEC sp_GetDepartmentsWithAgentCount");
         if ($depts_stmt === false) {
             $departments = array();
         } else {
@@ -89,7 +81,7 @@ class AdminController {
         }
         
         closeDBConnection($db);
-        include '../app/views/admin/manage_categories.php';
+        include '../app/views/admin/manage_departments.php';
     }
     
     // Manage Agents
