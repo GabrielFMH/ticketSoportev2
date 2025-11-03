@@ -28,10 +28,8 @@ class TicketController {
             $ticket_id = $this->model->createTicket($data);
             if ($ticket_id) {
                 $success = 'Ticket creado exitosamente. ID: ' . $ticket_id;
-                header('Location: ?controller=user&action=dashboard');
+                header("Location: ?controller=user&action=dashboard&success=" . urlencode($success));
                 exit;
-            } else {
-                $error = 'Error al crear el ticket';
             }
         }
         

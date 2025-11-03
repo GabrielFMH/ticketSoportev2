@@ -46,6 +46,12 @@
             <a href="?controller=user&action=dashboard">Mis Tickets</a>
         </div>
         
+        <?php if (isset($_GET['success'])): ?>
+            <div class="success" style="margin: 20px 0;">
+                <?php echo htmlspecialchars($_GET['success']); ?>
+            </div>
+        <?php endif; ?>
+        
         <h2>Mis Tickets</h2>
         <?php if (empty($tickets)): ?>
             <div class="no-tickets">
