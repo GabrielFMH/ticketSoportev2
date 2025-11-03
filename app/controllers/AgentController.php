@@ -16,6 +16,7 @@ class AgentController {
     
     public function dashboard() {
         $agent_id = $_SESSION['user_id'];
+        $tickets = array();
         
         $db = getDBConnection();
         
@@ -31,22 +32,28 @@ class AgentController {
             sqlsrv_free_stmt($dept_stmt);
         }
         
+        // Get department tickets (tickets available for assignment)
         if ($department_id) {
-            // Get tickets from agent's department using stored procedure
-            $params = array($department_id);
-            $params_ref = &$params;
-            $stmt = sqlsrv_prepare($db, "EXEC sp_GetAgentDepartmentTickets @department_id = ?", $params_ref);
-            if ($stmt === false || sqlsrv_execute($stmt) === false) {
-                $tickets = array();
-            } else {
-                $tickets = array();
-                while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+            $dept_params = array($department_id);
+            $dept_params_ref = &$dept_params;
+            $dept_stmt = sqlsrv_prepare($db, "EXEC sp_GetAgentDepartmentTickets @department_id = ?", $dept_params_ref);
+            if ($dept_stmt !== false && sqlsrv_execute($dept_stmt) !== false) {
+                while ($row = sqlsrv_fetch_array($dept_stmt, SQLSRV_FETCH_ASSOC)) {
                     $tickets[] = $row;
                 }
-                sqlsrv_free_stmt($stmt);
+                sqlsrv_free_stmt($dept_stmt);
             }
-        } else {
-            $tickets = array();
+        }
+        
+        // Get tickets specifically assigned to this agent (regardless of department)
+        $agent_params = array($agent_id);
+        $agent_params_ref = &$agent_params;
+        $agent_stmt = sqlsrv_prepare($db, "EXEC sp_GetAgentTickets @agent_id = ?", $agent_params_ref);
+        if ($agent_stmt !== false && sqlsrv_execute($agent_stmt) !== false) {
+            while ($row = sqlsrv_fetch_array($agent_stmt, SQLSRV_FETCH_ASSOC)) {
+                $tickets[] = $row;
+            }
+            sqlsrv_free_stmt($agent_stmt);
         }
         
         closeDBConnection($db);

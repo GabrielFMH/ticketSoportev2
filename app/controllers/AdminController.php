@@ -121,6 +121,67 @@ class AdminController {
         include '../app/views/admin/manage_agents.php';
     }
     
+    // Manage Escalated Tickets
+    public function manageEscalatedTickets() {
+        require_once '../app/models/TicketModel.php';
+        $ticketModel = new TicketModel();
+        $db = getDBConnection();
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (isset($_POST['reassign_ticket'])) {
+                $ticket_id = (int)$_POST['ticket_id'];
+                $new_agent_id = isset($_POST['new_agent_id']) && $_POST['new_agent_id'] !== '' ? (int)$_POST['new_agent_id'] : null;
+                $new_department_id = isset($_POST['new_department_id']) && $_POST['new_department_id'] !== '' ? (int)$_POST['new_department_id'] : null;
+                $notes = isset($_POST['reassignment_notes']) ? $_POST['reassignment_notes'] : '';
+                
+                // First reassign department if specified
+                if ($new_department_id) {
+                    $ticketModel->assignTicket($ticket_id, null, $new_department_id);
+                }
+                
+                // Then reassign to new agent if specified
+                if ($new_agent_id) {
+                    $current_ticket = $ticketModel->getTicketById($ticket_id);
+                    $department_id = $new_department_id ? $new_department_id : $current_ticket['department_id'];
+                    $ticketModel->assignTicket($ticket_id, $new_agent_id, $department_id);
+                }
+                
+                // Add history entry
+                $ticketModel->addHistory($ticket_id, 'Ticket reasignado por administrador', $notes, $_SESSION['user_id']);
+                
+                // Clear escalation status by adding resolution entry
+                $clear_stmt = sqlsrv_prepare($db, "EXEC sp_ClearEscalationStatus @ticket_id = ?", array($ticket_id));
+                if ($clear_stmt !== false) {
+                    sqlsrv_execute($clear_stmt);
+                    sqlsrv_free_stmt($clear_stmt);
+                }
+                
+                $success = 'Ticket reasignado correctamente.';
+            }
+        }
+        
+        // Get escalated tickets (tickets in 'En Progreso' status that have been escalated)
+        $escalated_stmt = sqlsrv_query($db, "EXEC sp_GetEscalatedTickets");
+        if ($escalated_stmt === false) {
+            $escalatedTickets = array();
+        } else {
+            $escalatedTickets = array();
+            while ($row = sqlsrv_fetch_array($escalated_stmt, SQLSRV_FETCH_ASSOC)) {
+                $escalatedTickets[] = $row;
+            }
+            sqlsrv_free_stmt($escalated_stmt);
+        }
+        
+        // Get all agents for reassignment
+        $agents = $ticketModel->getAllAgents();
+        
+        // Get departments for reassignment
+        $departments = $ticketModel->getDepartments();
+        
+        closeDBConnection($db);
+        include '../app/views/admin/manage_escalated_tickets.php';
+    }
+    
     public function __destruct() {
         // Model destruct
     }

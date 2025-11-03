@@ -86,6 +86,13 @@ class TicketController {
                 exit;
             }
             
+            // Check if this is an escalation
+            if (isset($_POST['escalate_ticket']) && $_SESSION['role'] === 'agent') {
+                $escalate_ticket_id = isset($_POST['ticket_id']) ? (int)$_POST['ticket_id'] : 0;
+                $this->escalate($escalate_ticket_id);
+                exit;
+            }
+            
             $ticket_id = isset($_POST['ticket_id']) ? (int)$_POST['ticket_id'] : 0;
             $status = $_POST['status'];
             $notes = isset($_POST['notes']) ? $_POST['notes'] : '';
@@ -184,13 +191,16 @@ class TicketController {
     }
     
     // For escalation (simple: reassign to admin if not resolved)
-    public function escalate() {
+    public function escalate($ticket_id = null) {
         if ($_SESSION['role'] !== 'agent') {
             header('Location: ?controller=agent&action=dashboard');
             exit;
         }
         
-        $ticket_id = isset($_POST['ticket_id']) ? (int)$_POST['ticket_id'] : 0;
+        if ($ticket_id === null) {
+            $ticket_id = isset($_POST['ticket_id']) ? (int)$_POST['ticket_id'] : 0;
+        }
+        
         if ($ticket_id) {
             // Find admin (role 'admin', any dept)
             $db = getDBConnection();
@@ -205,7 +215,11 @@ class TicketController {
             closeDBConnection($db);
             
             if ($admin) {
+                // First reassign to admin
                 $this->model->assignTicket($ticket_id, $admin['id']);
+                
+                // Then add explicit escalation history entry
+                $this->model->addHistory($ticket_id, 'Ticket escalado por agente', 'Escalado por el agente debido a complejidad o necesidad de supervisión', $_SESSION['user_id']);
             }
         }
         

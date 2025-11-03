@@ -514,3 +514,78 @@ BEGIN
     UPDATE users SET department_id = @department_id WHERE id = @agent_id AND role = 'agent';
 END;
 GO
+
+-- Get Tickets Assigned to Specific Agent
+CREATE PROCEDURE sp_GetAgentTickets
+    @agent_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT t.id, t.title, t.status, t.created_at, t.assignee_id, u.username as user_name, t.department_id
+    FROM tickets t
+    LEFT JOIN users u ON t.user_id = u.id
+    WHERE t.assignee_id = @agent_id
+    ORDER BY t.created_at DESC;
+END;
+GO
+
+-- Update Ticket Details Procedure
+CREATE PROCEDURE sp_UpdateTicketDetails
+    @ticket_id INT,
+    @category_id INT = NULL,
+    @priority_id INT = NULL,
+    @impact NVARCHAR(MAX) = NULL,
+    @urgency NVARCHAR(MAX) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE tickets
+    SET
+        category_id = COALESCE(@category_id, category_id),
+        priority_id = COALESCE(@priority_id, priority_id),
+        impact = COALESCE(@impact, impact),
+        urgency = COALESCE(@urgency, urgency),
+        updated_at = GETDATE()
+    WHERE id = @ticket_id;
+END;
+GO
+
+-- Get Escalated Tickets Procedure
+CREATE PROCEDURE sp_GetEscalatedTickets
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT DISTINCT
+        t.*,
+        u.username as user_name,
+        d.name as department_name,
+        a.username as assignee_name,
+        h.timestamp as escalated_at
+    FROM tickets t
+    LEFT JOIN users u ON t.user_id = u.id
+    LEFT JOIN departments d ON t.department_id = d.id
+    LEFT JOIN users a ON t.assignee_id = a.id
+    LEFT JOIN history h ON t.id = h.ticket_id
+        AND (h.action LIKE '%escalado%' OR h.action LIKE '%Escalar%')
+    WHERE t.status = 'En Progreso'
+        AND h.id IS NOT NULL  -- Has escalation history
+        AND NOT EXISTS (
+            SELECT 1 FROM history h2
+            WHERE h2.ticket_id = t.id
+            AND (h2.action LIKE '%Escalación resuelta%' OR h2.action LIKE '%reasignado por administrador%')
+        )  -- Has not been resolved
+    ORDER BY h.timestamp DESC;
+END;
+GO
+
+-- Clear Escalation Status Procedure
+CREATE PROCEDURE sp_ClearEscalationStatus
+    @ticket_id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    -- Add history entry indicating escalation was resolved
+    INSERT INTO history (ticket_id, action, notes, user_id)
+    VALUES (@ticket_id, 'Escalación resuelta por administrador', 'Ticket reasignado y escalación resuelta', NULL);
+END;
+GO

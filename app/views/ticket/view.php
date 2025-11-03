@@ -163,9 +163,9 @@
                     <label for="notes">Notas Internas:</label>
                     <textarea name="notes" placeholder="Agregue notas o comentarios..."></textarea>
                     <div class="button-group">
-                        <button type="submit">Actualizar</button>
+                        <button type="submit" name="update_ticket">Actualizar</button>
                         <?php if ($_SESSION['role'] === 'agent' && $ticket['status'] === 'En Progreso'): ?>
-                            <button type="submit" formaction="?controller=ticket&action=escalate" class="escalate-btn" onclick="return confirm('¿Escalar este ticket a administrador?')">Escalar</button>
+                            <button type="submit" name="escalate_ticket" class="escalate-btn" onclick="return confirm('¿Escalar este ticket a administrador?')">Escalar</button>
                         <?php endif; ?>
                     </div>
                 </form>
