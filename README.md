@@ -156,21 +156,7 @@ ticketSoportev2/
 4. **Gestionar Escalaciones**: Reasignar tickets escalados
 5. **Reportes**: Analizar rendimiento del sistema
 
-## 📝 Documentación Adicional
 
-El proyecto incluye documentación detallada en la carpeta `docs/`:
-- Historias de usuario por rol
-- Documentación de vistas
-- Guías de implementación
-
-## 🤝 Contribución
-
-Este sistema está diseñado para ser extensible. Las áreas principales para futuras mejoras incluyen:
-- API REST para integración
-- Aplicación móvil
-- Chat en vivo integrado
-- Integración con sistemas externos
-- Reportes avanzados con gráficos
 
 ---
 
