@@ -129,6 +129,7 @@ CREATE INDEX idx_tickets_department ON tickets(department_id);
 CREATE INDEX idx_tickets_assignee ON tickets(assignee_id);
 CREATE INDEX idx_users_role ON users(role);
 CREATE INDEX idx_users_department ON users(department_id);
+GO
 
 -- =============================================
 -- STORED PROCEDURES
@@ -469,4 +470,47 @@ BEGIN
     SELECT id, level, color FROM priorities ORDER BY id;
 END;
 GO
+
+-- Recent Updates Procedure for Notifications
+CREATE PROCEDURE sp_GetRecentTicketUpdates
+    @user_id INT,
+    @limit INT = 5
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT TOP (@limit) 
+        t.id as ticket_id,
+        t.title,
+        h.action,
+        h.timestamp as created_at,  -- <-- ESTAS LÍNEAS DEBEN IR JUNTAS
+        t.status
+    FROM tickets t
+    INNER JOIN history h ON t.id = h.ticket_id
+    WHERE t.user_id = @user_id
+    ORDER BY h.timestamp DESC;
+END;
+GO
+
+-- Get All Agents Procedure (AHORA ESTÁ AFUERA, EN EL LUGAR CORRECTO)
+CREATE PROCEDURE sp_GetAllAgents
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT u.id, u.username, u.email, u.role, u.department_id, d.name as department_name, u.created_at
+    FROM users u
+    LEFT JOIN departments d ON u.department_id = d.id
+    WHERE u.role = 'agent'
+    ORDER BY u.username;
+END;
+GO
+
+-- Update Agent Department Procedure (AHORA ESTÁ AFUERA, EN EL LUGAR CORRECTO)
+CREATE PROCEDURE sp_UpdateAgentDepartment
+    @agent_id INT,
+    @department_id INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE users SET department_id = @department_id WHERE id = @agent_id AND role = 'agent';
+END;
 GO

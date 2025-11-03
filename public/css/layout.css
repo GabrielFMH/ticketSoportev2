@@ -38,9 +38,132 @@
     font-size: 28px;
 }
 
+.header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
 .header-right {
     display: flex;
     gap: 10px;
+}
+
+/* ========================================
+   NOTIFICATION SYSTEM
+   ======================================== */
+
+.notification-bell {
+    position: relative;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+.notification-bell:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.bell-icon {
+    font-size: 20px;
+    color: #FFFFFF;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #FF4444;
+    color: #FFFFFF;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #FFFFFF;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    width: 350px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    margin-top: 10px;
+}
+
+.notification-header {
+    padding: 15px;
+    border-bottom: 1px solid #E9ECEF;
+    background: #F8F9FA;
+    border-radius: 8px 8px 0 0;
+}
+
+.notification-header h3 {
+    margin: 0 0 5px 0;
+    color: #007BFF;
+    font-size: 16px;
+}
+
+.notification-count {
+    font-size: 12px;
+    color: #6C757D;
+}
+
+.notification-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid #E9ECEF;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.notification-item:hover {
+    background-color: #F8F9FA;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+    border-radius: 0 0 8px 8px;
+}
+
+.notification-title {
+    font-weight: bold;
+    color: #212529;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.notification-action {
+    color: #007BFF;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.notification-time {
+    font-size: 11px;
+    color: #6C757D;
+}
+
+.no-notifications {
+    padding: 20px;
+    text-align: center;
+    color: #6C757D;
+    font-style: italic;
 }
 
 /* ========================================

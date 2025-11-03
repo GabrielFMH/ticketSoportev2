@@ -25,7 +25,8 @@ class TicketController {
                 'category_id' => (int)$_POST['category_id'],
                 'priority_id' => (int)$_POST['priority_id'],
                 'impact' => $_POST['impact'],
-                'urgency' => $_POST['urgency']
+                'urgency' => $_POST['urgency'],
+                'department_id' => !empty($_POST['department_id']) ? (int)$_POST['department_id'] : null
             );
             
             $ticket_id = $this->model->createTicket($data);

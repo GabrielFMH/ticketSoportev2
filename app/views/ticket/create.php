@@ -71,6 +71,18 @@
                 </div>
             </div>
             
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="department_id">Departamento:</label>
+                    <select id="department_id" name="department_id">
+                        <option value="">Seleccione un departamento</option>
+                        <?php foreach ($departments as $dept): ?>
+                            <option value="<?php echo $dept['id']; ?>"><?php echo htmlspecialchars($dept['name']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+            
             <button type="submit" class="btn btn-primary">Crear Ticket</button>
         </form>
     </div>

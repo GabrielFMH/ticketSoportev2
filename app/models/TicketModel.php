@@ -10,7 +10,7 @@ class TicketModel {
     }
     
     public function createTicket($data) {
-        // $data: array with user_id, title, description, contact_info, category_id, priority_id, impact, urgency
+        // $data: array with user_id, title, description, contact_info, category_id, priority_id, impact, urgency, department_id
         $user_id = (int)$data['user_id'];
         $title = $data['title'];
         $description = $data['description'];
@@ -19,18 +19,21 @@ class TicketModel {
         $priority_id = (int)$data['priority_id'];
         $impact = $data['impact'];
         $urgency = $data['urgency'];
+        $department_id = isset($data['department_id']) ? $data['department_id'] : null;
         
-        // Get department from category using stored procedure
-        $dept_params = array($category_id);
-        $dept_params_ref = &$dept_params;
-        $dept_stmt = sqlsrv_prepare($this->db, "EXEC sp_GetDepartmentFromCategory @category_id = ?", $dept_params_ref);
-        if ($dept_stmt === false) {
-            die('Error preparing dept query: ' . print_r(sqlsrv_errors(), true));
+        // If no department selected by user, get department from category using stored procedure
+        if (!$department_id) {
+            $dept_params = array($category_id);
+            $dept_params_ref = &$dept_params;
+            $dept_stmt = sqlsrv_prepare($this->db, "EXEC sp_GetDepartmentFromCategory @category_id = ?", $dept_params_ref);
+            if ($dept_stmt === false) {
+                die('Error preparing dept query: ' . print_r(sqlsrv_errors(), true));
+            }
+            sqlsrv_execute($dept_stmt);
+            $dept_row = sqlsrv_fetch_array($dept_stmt, SQLSRV_FETCH_ASSOC);
+            $department_id = $dept_row ? $dept_row['department_id'] : null;
+            sqlsrv_free_stmt($dept_stmt);
         }
-        sqlsrv_execute($dept_stmt);
-        $dept_row = sqlsrv_fetch_array($dept_stmt, SQLSRV_FETCH_ASSOC);
-        $department_id = $dept_row ? $dept_row['department_id'] : null;
-        sqlsrv_free_stmt($dept_stmt);
         
         // Create ticket using stored procedure
         $params = array($user_id, $title, $description, $contact_info, $category_id, $priority_id, $impact, $urgency, $department_id);
@@ -118,6 +121,25 @@ class TicketModel {
         }
         
         return $ticket;
+    }
+    
+    public function getRecentTicketUpdates($user_id, $limit = 5) {
+        $params = array($user_id, $limit);
+        $params_ref = &$params;
+        $stmt = sqlsrv_prepare($this->db, "EXEC sp_GetRecentTicketUpdates @user_id = ?, @limit = ?", $params_ref);
+        if ($stmt === false) {
+            return array();
+        }
+        if (sqlsrv_execute($stmt) === false) {
+            sqlsrv_free_stmt($stmt);
+            return array();
+        }
+        $updates = array();
+        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+            $updates[] = $row;
+        }
+        sqlsrv_free_stmt($stmt);
+        return $updates;
     }
     
     public function updateTicketStatus($ticket_id, $status, $notes, $user_id) {
@@ -234,6 +256,32 @@ class TicketModel {
         }
         sqlsrv_free_stmt($stmt);
         return $departments;
+    }
+    
+    public function getAllAgents() {
+        $stmt = sqlsrv_query($this->db, "EXEC sp_GetAllAgents");
+        if ($stmt === false) {
+            return array();
+        }
+        $agents = array();
+        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+            $agents[] = $row;
+        }
+        sqlsrv_free_stmt($stmt);
+        return $agents;
+    }
+    
+    public function updateAgentDepartment($agent_id, $department_id) {
+        $agent_id = (int)$agent_id;
+        $department_id = $department_id ? (int)$department_id : null;
+        
+        $params = array($agent_id, $department_id);
+        $params_ref = &$params;
+        $stmt = sqlsrv_prepare($this->db, "EXEC sp_UpdateAgentDepartment @agent_id = ?, @department_id = ?", $params_ref);
+        $success = ($stmt !== false && sqlsrv_execute($stmt) !== false);
+        sqlsrv_free_stmt($stmt);
+        
+        return $success;
     }
     
     private function getUserEmail($user_id) {

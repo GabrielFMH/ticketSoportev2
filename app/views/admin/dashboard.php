@@ -16,6 +16,7 @@
         <div class="header-right">
             <a href="?controller=admin&action=dashboard" class="btn btn-primary">Reportes</a>
             <a href="?controller=admin&action=manageCategories" class="btn btn-primary">Gestionar Categorías</a>
+            <a href="?controller=admin&action=manageAgents" class="btn btn-primary">Gestionar Agentes</a>
             <a href="?controller=user&action=logout" class="btn btn-danger">Cerrar Sesión</a>
         </div>
     </div>

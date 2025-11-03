@@ -92,7 +92,34 @@ class AdminController {
         include '../app/views/admin/manage_categories.php';
     }
     
-    // Similar for departments, priorities if needed, but basic for now
+    // Manage Agents
+    public function manageAgents() {
+        require_once '../app/models/TicketModel.php';
+        $ticketModel = new TicketModel();
+        $db = getDBConnection();
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (isset($_POST['edit_department'])) {
+                $agent_id = (int)$_POST['agent_id'];
+                $department_id = isset($_POST['department_id']) && $_POST['department_id'] !== '' ? (int)$_POST['department_id'] : null;
+                
+                if ($ticketModel->updateAgentDepartment($agent_id, $department_id)) {
+                    $success = 'Departamento actualizado correctamente.';
+                } else {
+                    $error = 'Error al actualizar el departamento.';
+                }
+            }
+        }
+        
+        // Get all agents
+        $agents = $ticketModel->getAllAgents();
+        
+        // Get departments for dropdown
+        $departments = $ticketModel->getDepartments();
+        
+        closeDBConnection($db);
+        include '../app/views/admin/manage_agents.php';
+    }
     
     public function __destruct() {
         // Model destruct

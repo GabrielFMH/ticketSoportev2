@@ -5,11 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Usuario - Sistema de Tickets</title>
     <link href="css/main.css" rel="stylesheet">
+    <script src="js/user-notifications.js"></script>
 </head>
 <body>
     <div class="header">
         <h1>Bienvenido, <?php echo htmlspecialchars($_SESSION['username']); ?> (Usuario)</h1>
-        <a href="?controller=user&action=logout" class="logout">Cerrar Sesión</a>
+        <div class="header-actions">
+            <div class="notification-bell" onclick="toggleNotifications()">
+                <span class="bell-icon">🔔</span>
+                <?php if (!empty($recentUpdates) && count($recentUpdates) > 0): ?>
+                    <span class="notification-badge"><?php echo count($recentUpdates); ?></span>
+                <?php endif; ?>
+                <div id="notificationDropdown" class="notification-dropdown">
+                    <div class="notification-header">
+                        <h3>Actualizaciones Recientes</h3>
+                        <span class="notification-count"><?php echo count($recentUpdates); ?> actualizaciones</span>
+                    </div>
+                    <div class="notification-list">
+                        <?php if (!empty($recentUpdates)): ?>
+                            <?php foreach ($recentUpdates as $update): ?>
+                                <div class="notification-item" onclick="viewTicket(<?php echo $update['ticket_id']; ?>)">
+                                    <div class="notification-title">Ticket #<?php echo $update['ticket_id']; ?> - <?php echo htmlspecialchars($update['title']); ?></div>
+                                    <div class="notification-action"><?php echo htmlspecialchars($update['action']); ?></div>
+                                    <div class="notification-time"><?php echo $update['created_at'] ? $update['created_at']->format('d/m/Y H:i') : 'Fecha no disponible'; ?></div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="no-notifications">No hay actualizaciones recientes</div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+            <a href="?controller=user&action=logout" class="logout">Cerrar Sesión</a>
+        </div>
     </div>
     
     <div class="container">

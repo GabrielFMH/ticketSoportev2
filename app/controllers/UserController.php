@@ -126,6 +126,10 @@ class UserController {
                 }
                 sqlsrv_free_stmt($stmt);
             }
+            
+            // Get recent ticket updates for notifications
+            $ticketModel = new TicketModel();
+            $recentUpdates = $ticketModel->getRecentTicketUpdates($userId, 5);
         } // For agent/admin, handle in their controllers
         
         include '../app/views/user/dashboard.php';
