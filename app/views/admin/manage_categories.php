@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestionar Categorías - Sistema de Tickets</title>
     <link href="css/main.css" rel="stylesheet">
+    <script src="js/admin-categories.js"></script>
 </head>
 <body>
     <div class="header">
@@ -109,11 +110,5 @@
         </div>
     </div>
     
-    <script>
-        function toggleEdit(id) {
-            var editDiv = document.getElementById('edit-' + id);
-            editDiv.style.display = editDiv.style.display === 'none' ? 'block' : 'none';
-        }
-    </script>
 </body>
 </html>
