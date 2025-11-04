@@ -34,7 +34,6 @@ class TicketController {
         }
         
         // Load options for form
-        $categories = $this->model->getCategories();
         $priorities = $this->model->getPriorities();
         $departments = $this->model->getDepartments();
         
@@ -58,19 +57,17 @@ class TicketController {
         // Check if user owns or is agent/admin
         $role = $_SESSION['role'];
         $user_id = $_SESSION['user_id'];
-        if ($role === 'user' && $ticket['user_id'] != $user_id) {
+        if ($role === 'user' && $ticket['usuario_id'] != $user_id) {
             $error = 'No tienes permiso para ver este ticket';
             include '../app/views/errors/error.php';
             exit;
         }
         
         // Load options for form (only needed for agents/admins)
-        if (in_array($role, ['agent', 'admin'])) {
-            $categories = $this->model->getCategories();
+        if (in_array($role, ['agente', 'admin'])) {
             $priorities = $this->model->getPriorities();
         } else {
             // Initialize empty arrays to avoid undefined variable errors
-            $categories = array();
             $priorities = array();
         }
         
@@ -97,7 +94,6 @@ class TicketController {
             $user_id = $_SESSION['user_id'];
             
             // Only agents/admins can update these fields
-            $category_id = isset($_POST['category_id']) ? (int)$_POST['category_id'] : null;
             $priority_id = isset($_POST['priority_id']) ? (int)$_POST['priority_id'] : null;
             $impact = isset($_POST['impact']) ? $_POST['impact'] : null;
             $urgency = isset($_POST['urgency']) ? $_POST['urgency'] : null;
@@ -107,9 +103,9 @@ class TicketController {
                 $success = $this->model->updateTicketStatus($ticket_id, $status, $notes, $user_id);
                 
                 // Update additional fields if provided (for agents/admins only)
-                if (in_array($_SESSION['role'], ['agent', 'admin']) && ($category_id || $priority_id || $impact || $urgency)) {
+                if (in_array($_SESSION['role'], ['agente', 'admin']) && ($priority_id || $impact || $urgency)) {
                     try {
-                        $this->model->updateTicketDetails($ticket_id, $category_id, $priority_id, $impact, $urgency);
+                        $this->model->updateTicketDetails($ticket_id, $priority_id, $impact, $urgency);
                     } catch (Exception $e) {
                         // Log error but don't fail the whole update
                         error_log("Error updating ticket details: " . $e->getMessage());
@@ -135,7 +131,7 @@ class TicketController {
     }
     
     public function accept() {
-        if ($_SESSION['role'] !== 'agent') {
+        if ($_SESSION['role'] !== 'agente') {
             header('Location: ?controller=agent&action=dashboard');
             exit;
         }
@@ -173,7 +169,7 @@ class TicketController {
         // Check if user owns the ticket and it's in "Abierto" status
         $role = $_SESSION['role'];
         $user_id = $_SESSION['user_id'];
-        if ($role === 'user' && ($ticket['user_id'] != $user_id || $ticket['status'] !== 'Abierto')) {
+        if ($role === 'user' && ($ticket['usuario_id'] != $user_id || $ticket['estado'] !== 'Abierto')) {
             $error = 'No tienes permiso para cancelar este ticket';
             include '../app/views/errors/error.php';
             exit;
@@ -195,7 +191,7 @@ class TicketController {
     
     // For escalation (simple: reassign to admin if not resolved)
     public function escalate($ticket_id = null) {
-        if ($_SESSION['role'] !== 'agent') {
+        if ($_SESSION['role'] !== 'agente') {
             header('Location: ?controller=agent&action=dashboard');
             exit;
         }
@@ -207,7 +203,7 @@ class TicketController {
         if ($ticket_id) {
             // Find admin (role 'admin', any dept)
             $db = getDBConnection();
-            $admin_stmt = sqlsrv_query($db, "EXEC sp_GetAdmin");
+            $admin_stmt = sqlsrv_query($db, "EXEC Usp_Tik_S_ObtenerAdmin");
             if ($admin_stmt === false) {
                 closeDBConnection($db);
                 header("Location: ?controller=ticket&action=view&id=$ticket_id");

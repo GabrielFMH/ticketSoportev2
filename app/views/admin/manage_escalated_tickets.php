@@ -54,12 +54,12 @@
                         <?php foreach ($escalatedTickets as $ticket): ?>
                             <tr>
                                 <td><?php echo $ticket['id']; ?></td>
-                                <td><?php echo htmlspecialchars($ticket['title']); ?></td>
-                                <td><?php echo htmlspecialchars($ticket['user_name']); ?></td>
-                                <td><?php echo htmlspecialchars(isset($ticket['department_name']) ? $ticket['department_name'] : 'No asignado'); ?></td>
-                                <td><?php echo htmlspecialchars(isset($ticket['assignee_name']) ? $ticket['assignee_name'] : 'No asignado'); ?></td>
-                                <td><span class="status status-<?php echo strtolower(str_replace(' ', '-', $ticket['status'])); ?>"><?php echo $ticket['status']; ?></span></td>
-                                <td><?php echo $ticket['escalated_at'] ? $ticket['escalated_at']->format('d/m/Y H:i') : 'N/A'; ?></td>
+                                <td><?php echo htmlspecialchars($ticket['titulo']); ?></td>
+                                <td><?php echo htmlspecialchars($ticket['nombre_usuario']); ?></td>
+                                <td><?php echo htmlspecialchars(isset($ticket['nombre_departamento']) ? $ticket['nombre_departamento'] : 'No asignado'); ?></td>
+                                <td><?php echo htmlspecialchars(isset($ticket['nombre_asignado']) ? $ticket['nombre_asignado'] : 'No asignado'); ?></td>
+                                <td><span class="status status-<?php echo strtolower(str_replace(' ', '-', $ticket['estado'])); ?>"><?php echo $ticket['estado']; ?></span></td>
+                                <td><?php echo $ticket['escalado_en'] ? $ticket['escalado_en']->format('d/m/Y H:i') : 'N/A'; ?></td>
                                 <td>
                                     <span class="btn btn-warning" onclick="toggleReassign(<?php echo $ticket['id']; ?>)">Reasignar</span>
                                     <a href="?controller=ticket&action=view&id=<?php echo $ticket['id']; ?>" class="btn btn-primary">Ver Detalles</a>
@@ -78,7 +78,7 @@
                                                     <select id="new-dept-<?php echo $ticket['id']; ?>" name="new_department_id" onchange="updateAgentDropdown(<?php echo $ticket['id']; ?>)">
                                                         <option value="">Sin cambiar</option>
                                                         <?php foreach ($departments as $dept): ?>
-                                                            <option value="<?php echo $dept['id']; ?>"><?php echo htmlspecialchars($dept['name']); ?></option>
+                                                            <option value="<?php echo $dept['id']; ?>"><?php echo htmlspecialchars($dept['nombre']); ?></option>
                                                         <?php endforeach; ?>
                                                     </select>
                                                 </div>
@@ -87,7 +87,7 @@
                                                     <select id="new-agent-<?php echo $ticket['id']; ?>" name="new_agent_id">
                                                         <option value="">Primero seleccione un departamento</option>
                                                         <?php foreach ($agents as $agent): ?>
-                                                            <option value="<?php echo $agent['id']; ?>" data-department="<?php echo $agent['department_id']; ?>" style="display: none;"><?php echo htmlspecialchars($agent['username']); ?></option>
+                                                            <option value="<?php echo $agent['id']; ?>" data-department="<?php echo $agent['department_id']; ?>" style="display: none;"><?php echo htmlspecialchars($agent['nombre_usuario']); ?></option>
                                                         <?php endforeach; ?>
                                                     </select>
                                                 </div>

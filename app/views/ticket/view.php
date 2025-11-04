@@ -36,10 +36,7 @@
                 <span class="detail-label">Contacto:</span>
                 <span class="detail-value"><?php echo htmlspecialchars($ticket['contact_info']); ?></span>
             </div>
-            <div class="detail-row">
-                <span class="detail-label">Categoría:</span>
-                <span class="detail-value"><?php echo htmlspecialchars($ticket['category_name']); ?></span>
-            </div>
+            <!-- Categoría eliminada del sistema -->
             <div class="detail-row">
                 <span class="detail-label">Prioridad:</span>
                 <span class="detail-value"><?php echo htmlspecialchars($ticket['priority_level']); ?></span>
@@ -50,15 +47,15 @@
             </div>
             <div class="detail-row">
                 <span class="detail-label">Departamento:</span>
-                <span class="detail-value"><?php echo htmlspecialchars(isset($ticket['department_name']) ? $ticket['department_name'] : 'No asignado'); ?></span>
+                <span class="detail-value"><?php echo htmlspecialchars(isset($ticket['nombre_departamento']) ? $ticket['nombre_departamento'] : 'No asignado'); ?></span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Asignado a:</span>
-                <span class="detail-value"><?php echo htmlspecialchars(isset($ticket['assignee_name']) ? $ticket['assignee_name'] : 'No asignado'); ?></span>
+                <span class="detail-value"><?php echo htmlspecialchars(isset($ticket['nombre_asignado']) ? $ticket['nombre_asignado'] : 'No asignado'); ?></span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Creado por:</span>
-                <span class="detail-value"><?php echo htmlspecialchars($ticket['user_name']); ?></span>
+                <span class="detail-value"><?php echo htmlspecialchars($ticket['nombre_usuario']); ?></span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Impacto:</span>
@@ -89,7 +86,7 @@
                         <?php if ($item['notes']): ?>
                             <div class="notes"><?php echo nl2br(htmlspecialchars($item['notes'])); ?></div>
                         <?php endif; ?>
-                        <div class="timestamp">Por <?php echo htmlspecialchars(isset($item['username']) ? $item['username'] : 'Sistema'); ?> el <?php echo $item['timestamp'] ? $item['timestamp']->format('d/m/Y H:i') : 'N/A'; ?></div>
+                        <div class="timestamp">Por <?php echo htmlspecialchars(isset($item['nombre_usuario']) ? $item['nombre_usuario'] : 'Sistema'); ?> el <?php echo $item['timestamp'] ? $item['timestamp']->format('d/m/Y H:i') : 'N/A'; ?></div>
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -122,20 +119,23 @@
                         <option value="Cerrado" <?php echo $ticket['status'] === 'Cerrado' ? 'selected' : ''; ?>>Cerrado</option>
                     </select>
                     
+                    <!-- Categoría eliminada del sistema -->
                     <div class="form-row">
-                        <div class="form-group">
-                            <label for="category_id">Categoría:</label>
-                            <select id="category_id" name="category_id">
-                                <?php foreach ($categories as $cat): ?>
-                                    <option value="<?php echo $cat['id']; ?>" <?php echo ($cat['id'] == $ticket['category_id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($cat['name']); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
                         <div class="form-group">
                             <label for="priority_id">Prioridad:</label>
                             <select id="priority_id" name="priority_id">
                                 <?php foreach ($priorities as $pri): ?>
-                                    <option value="<?php echo $pri['id']; ?>" <?php echo ($pri['id'] == $ticket['priority_id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($pri['level']); ?></option>
+                                    <option value="<?php echo $pri['id']; ?>" <?php echo ($pri['id'] == $ticket['priority_id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($pri['nivel']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                        <div class="form-group">
+                            <label for="department_id">Departamento:</label>
+                            <select id="department_id" name="department_id">
+                                <option value="">Seleccionar departamento</option>
+                                <?php foreach ($departments as $dept): ?>
+                                    <option value="<?php echo $dept['id']; ?>" <?php echo (isset($ticket['department_id']) && $dept['id'] == $ticket['department_id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($dept['nombre']); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>

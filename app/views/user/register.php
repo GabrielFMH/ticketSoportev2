@@ -30,8 +30,8 @@
             
             <label for="role">Rol:</label>
             <select id="role" name="role">
-                <option value="user" selected>Usuario</option>
-                <option value="agent">Agente</option>
+                <option value="usuario" selected>Usuario</option>
+                <option value="agente">Agente</option>
                 <option value="admin">Administrador</option>
             </select>
             

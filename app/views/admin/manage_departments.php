@@ -62,9 +62,9 @@
                         <?php else: ?>
                             <?php foreach ($departments as $dept): ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($dept['name']); ?></td>
-                                    <td><?php echo htmlspecialchars(isset($dept['description']) ? $dept['description'] : 'N/A'); ?></td>
-                                    <td><?php echo isset($dept['agent_count']) ? $dept['agent_count'] : 0; ?></td>
+                                    <td><?php echo htmlspecialchars($dept['nombre']); ?></td>
+                                    <td><?php echo htmlspecialchars(isset($dept['descripcion']) ? $dept['descripcion'] : 'N/A'); ?></td>
+                                    <td><?php echo isset($dept['cantidad_agentes']) ? $dept['cantidad_agentes'] : 0; ?></td>
                                     <td>
                                         <span class="cancel-btn" onclick="toggleEdit(<?php echo $dept['id']; ?>)">Editar</span>
                                         <form method="POST" style="display: inline;" onsubmit="return confirm('¿Eliminar este departamento?')">
@@ -81,10 +81,10 @@
                                                 <input type="hidden" name="edit" value="1">
                                                 <input type="hidden" name="id" value="<?php echo $dept['id']; ?>">
                                                 <label for="edit-name-<?php echo $dept['id']; ?>">Nombre:</label>
-                                                <input type="text" id="edit-name-<?php echo $dept['id']; ?>" name="name" value="<?php echo htmlspecialchars($dept['name']); ?>" required>
+                                                <input type="text" id="edit-name-<?php echo $dept['id']; ?>" name="name" value="<?php echo htmlspecialchars($dept['nombre']); ?>" required>
                                                 
                                                 <label for="edit-desc-<?php echo $dept['id']; ?>">Descripción:</label>
-                                                <textarea id="edit-desc-<?php echo $dept['id']; ?>" name="description"><?php echo htmlspecialchars(isset($dept['description']) ? $dept['description'] : ''); ?></textarea>
+                                                <textarea id="edit-desc-<?php echo $dept['id']; ?>" name="description"><?php echo htmlspecialchars(isset($dept['descripcion']) ? $dept['descripcion'] : ''); ?></textarea>
                                                 
                                                 <button type="submit" class="btn btn-primary">Guardar Cambios</button>
                                                 <button type="button" class="cancel-btn" onclick="toggleEdit(<?php echo $dept['id']; ?>)">Cancelar</button>

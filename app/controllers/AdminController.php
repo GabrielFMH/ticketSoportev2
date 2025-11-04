@@ -15,7 +15,6 @@ class AdminController {
     }
     
     public function dashboard() {
-        $ticketsPerCategory = $this->reportModel->getTicketsPerCategory();
         $ticketsPerAgent = $this->reportModel->getTicketsPerAgent();
         $ticketsPerDepartment = $this->reportModel->getTicketsPerDepartment();
         $avgResolutionTime = $this->reportModel->getAverageResolutionTime();
@@ -34,7 +33,7 @@ class AdminController {
                 $description = $_POST['description'];
                 $params = array($name, $description);
                 $params_ref = &$params;
-                $stmt = sqlsrv_prepare($db, "EXEC sp_CreateDepartment @name = ?, @description = ?", $params_ref);
+                $stmt = sqlsrv_prepare($db, "EXEC Usp_Tik_U_Departamento @nombre = ?, @descripcion = ?", $params_ref);
                 if ($stmt === false || sqlsrv_execute($stmt) === false) {
                     $error = 'Error al agregar departamento: ' . print_r(sqlsrv_errors(), true);
                 } else {
@@ -47,7 +46,7 @@ class AdminController {
                 $description = $_POST['description'];
                 $params = array($id, $name, $description);
                 $params_ref = &$params;
-                $stmt = sqlsrv_prepare($db, "EXEC sp_UpdateDepartment @id = ?, @name = ?, @description = ?", $params_ref);
+                $stmt = sqlsrv_prepare($db, "EXEC Usp_Tik_U_Departamento @id = ?, @nombre = ?, @descripcion = ?", $params_ref);
                 if ($stmt === false || sqlsrv_execute($stmt) === false) {
                     $error = 'Error al editar departamento: ' . print_r(sqlsrv_errors(), true);
                 } else {
@@ -58,7 +57,7 @@ class AdminController {
                 $id = (int)$_POST['id'];
                 $params = array($id);
                 $params_ref = &$params;
-                $stmt = sqlsrv_prepare($db, "EXEC sp_DeleteDepartment @id = ?", $params_ref);
+                $stmt = sqlsrv_prepare($db, "EXEC Usp_Tik_D_EliminarDepartamento @id = ?", $params_ref);
                 if ($stmt === false || sqlsrv_execute($stmt) === false) {
                     $error = 'Error al eliminar departamento: ' . print_r(sqlsrv_errors(), true);
                 } else {
@@ -69,7 +68,7 @@ class AdminController {
         }
         
         // Get all departments using stored procedure with agent count
-        $depts_stmt = sqlsrv_query($db, "EXEC sp_GetDepartmentsWithAgentCount");
+        $depts_stmt = sqlsrv_query($db, "EXEC Usp_Tik_S_ObtenerDepartamentosConConteoAgentes");
         if ($depts_stmt === false) {
             $departments = array();
         } else {
@@ -142,7 +141,7 @@ class AdminController {
                 $ticketModel->addHistory($ticket_id, 'Ticket reasignado por administrador', $notes, $_SESSION['user_id']);
                 
                 // Clear escalation status by adding resolution entry
-                $clear_stmt = sqlsrv_prepare($db, "EXEC sp_ClearEscalationStatus @ticket_id = ?", array($ticket_id));
+                $clear_stmt = sqlsrv_prepare($db, "EXEC Usp_Tik_U_LimpiarEstadoEscalacion @ticket_id = ?", array($ticket_id));
                 if ($clear_stmt !== false) {
                     sqlsrv_execute($clear_stmt);
                     sqlsrv_free_stmt($clear_stmt);
@@ -153,7 +152,7 @@ class AdminController {
         }
         
         // Get escalated tickets (tickets in 'En Progreso' status that have been escalated)
-        $escalated_stmt = sqlsrv_query($db, "EXEC sp_GetEscalatedTickets");
+        $escalated_stmt = sqlsrv_query($db, "EXEC Usp_Tik_S_ObtenerTicketsEscalados");
         if ($escalated_stmt === false) {
             $escalatedTickets = array();
         } else {

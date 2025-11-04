@@ -25,9 +25,9 @@
                         <?php if (!empty($recentUpdates)): ?>
                             <?php foreach ($recentUpdates as $update): ?>
                                 <div class="notification-item" onclick="viewTicket(<?php echo $update['ticket_id']; ?>)">
-                                    <div class="notification-title">Ticket #<?php echo $update['ticket_id']; ?> - <?php echo htmlspecialchars($update['title']); ?></div>
-                                    <div class="notification-action"><?php echo htmlspecialchars($update['action']); ?></div>
-                                    <div class="notification-time"><?php echo $update['created_at'] ? $update['created_at']->format('d/m/Y H:i') : 'Fecha no disponible'; ?></div>
+                                    <div class="notification-title">Ticket #<?php echo $update['ticket_id']; ?> - <?php echo htmlspecialchars($update['titulo']); ?></div>
+                                    <div class="notification-action"><?php echo htmlspecialchars($update['accion']); ?></div>
+                                    <div class="notification-time"><?php echo $update['creado_en'] ? $update['creado_en']->format('d/m/Y H:i') : 'Fecha no disponible'; ?></div>
                                 </div>
                             <?php endforeach; ?>
                         <?php else: ?>
@@ -80,20 +80,20 @@
                     <?php foreach ($tickets as $ticket): ?>
                         <tr>
                             <td><?php echo $ticket['id']; ?></td>
-                            <td><?php echo htmlspecialchars($ticket['title']); ?></td>
-                            <td><?php echo htmlspecialchars($ticket['description']); ?></td>
-                            <!-- <td><?php echo htmlspecialchars($ticket['contact_info']); ?></td>
-                            <td><?php echo htmlspecialchars($ticket['category'] ?? 'N/A'); ?></td>
-                            <td><?php echo htmlspecialchars($ticket['priority'] ?? 'N/A'); ?></td>*/ -->
-                            <td><span class="status status-<?php echo strtolower(str_replace(' ', '-', $ticket['status'])); ?>"><?php echo $ticket['status']; ?></span></td>
-                            <!-- <td><?php echo htmlspecialchars($ticket['assignee'] ?? 'No asignado'); ?></td>
-                            <td><?php echo htmlspecialchars($ticket['impact'] ?? 'N/A'); ?></td>
-                            <td><?php echo htmlspecialchars($ticket['urgency'] ?? 'N/A'); ?></td> -->
-                            <!-- <td><?php echo $ticket['created_at'] ? $ticket['created_at']->format('d/m/Y H:i') : 'N/A'; ?></td> -->
-                            <td><?php echo $ticket['updated_at'] ? $ticket['updated_at']->format('d/m/Y H:i') : 'N/A'; ?></td>
+                            <td><?php echo htmlspecialchars($ticket['titulo']); ?></td>
+                            <td><?php echo htmlspecialchars($ticket['descripcion']); ?></td>
+                            <!-- <td><?php echo htmlspecialchars($ticket['info_contacto']); ?></td>
+                            <td><?php echo htmlspecialchars($ticket['categoria'] ?? 'N/A'); ?></td>
+                            <td><?php echo htmlspecialchars($ticket['prioridad'] ?? 'N/A'); ?></td> -->
+                            <td><span class="status status-<?php echo strtolower(str_replace(' ', '-', $ticket['estado'])); ?>"><?php echo $ticket['estado']; ?></span></td>
+                            <!-- <td><?php echo htmlspecialchars($ticket['asignado'] ?? 'No asignado'); ?></td>
+                            <td><?php echo htmlspecialchars($ticket['impacto'] ?? 'N/A'); ?></td>
+                            <td><?php echo htmlspecialchars($ticket['urgencia'] ?? 'N/A'); ?></td> -->
+                            <!-- <td><?php echo $ticket['creado_en'] ? $ticket['creado_en']->format('d/m/Y H:i') : 'N/A'; ?></td> -->
+                            <td><?php echo $ticket['actualizado_en'] ? $ticket['actualizado_en']->format('d/m/Y H:i') : 'N/A'; ?></td>
                             <td class="actions">
                                 <a href="?controller=ticket&action=view&id=<?php echo $ticket['id']; ?>" class="btn btn-primary">Detalles</a>
-                                <?php if ($ticket['status'] === 'Abierto'): ?>
+                                <?php if ($ticket['estado'] === 'Abierto'): ?>
                                     <a href="?controller=ticket&action=cancel&id=<?php echo $ticket['id']; ?>"
                                        onclick="return confirm('¿Estás seguro de que deseas cancelar este ticket?');"
                                        class="btn btn-primary">Cancelar</a>

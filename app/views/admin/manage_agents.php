@@ -55,11 +55,11 @@
                             <?php foreach ($agents as $agent): ?>
                                 <tr>
                                     <td><?php echo $agent['id']; ?></td>
-                                    <td><?php echo htmlspecialchars($agent['username']); ?></td>
+                                    <td><?php echo htmlspecialchars($agent['nombre_usuario']); ?></td>
                                     <td><?php echo htmlspecialchars($agent['email']); ?></td>
-                                    <td><?php echo htmlspecialchars(isset($agent['specialization']) ? $agent['specialization'] : 'N/A'); ?></td>
-                                    <td><?php echo htmlspecialchars(isset($agent['department_name']) ? $agent['department_name'] : 'Sin asignar'); ?></td>
-                                    <td><?php echo $agent['created_at'] ? $agent['created_at']->format('d/m/Y H:i') : 'N/A'; ?></td>
+                                    <td><?php echo htmlspecialchars(isset($agent['especializacion']) ? $agent['especializacion'] : 'N/A'); ?></td>
+                                    <td><?php echo htmlspecialchars(isset($agent['nombre_departamento']) ? $agent['nombre_departamento'] : 'Sin asignar'); ?></td>
+                                    <td><?php echo $agent['creado_en'] ? $agent['creado_en']->format('d/m/Y H:i') : 'N/A'; ?></td>
                                     <td>
                                         <span class="btn btn-primary" onclick="toggleEdit(<?php echo $agent['id']; ?>)">Editar Departamento</span>
                                     </td>
@@ -78,7 +78,7 @@
                                                         <option value="">Sin asignar</option>
                                                         <?php foreach ($departments as $dept): ?>
                                                             <option value="<?php echo $dept['id']; ?>" <?php echo ($agent['department_id'] == $dept['id']) ? 'selected' : ''; ?>>
-                                                                <?php echo htmlspecialchars($dept['name']); ?>
+                                                                <?php echo htmlspecialchars($dept['nombre']); ?>
                                                             </option>
                                                         <?php endforeach; ?>
                                                     </select>

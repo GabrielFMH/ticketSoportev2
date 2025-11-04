@@ -2,6 +2,8 @@
 // UserController for authentication and user management
 // PHP 5.5 compatible with sqlsrv
 
+require_once '../app/models/TicketModel.php';
+
 class UserController {
     private $db;
     
@@ -17,7 +19,7 @@ class UserController {
             // Use stored procedure for authentication
             $params = array($username, $password);
             $params_ref = &$params;
-            $stmt = sqlsrv_prepare($this->db, "EXEC sp_AuthenticateUser @username = ?, @password = ?", $params_ref);
+            $stmt = sqlsrv_prepare($this->db, "EXEC Usp_Tik_S_AutenticarUsuario @nombre_usuario = ?, @contrasena = ?", $params_ref);
             if ($stmt === false) {
                 $error = 'Error preparing query: ' . print_r(sqlsrv_errors(), true);
             } else {
@@ -25,14 +27,14 @@ class UserController {
                     $error = 'Error executing query: ' . print_r(sqlsrv_errors(), true);
                 } else {
                     $user = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
-                    if ($user) {
-                        $_SESSION['user_id'] = $user['id'];
-                        $_SESSION['username'] = $user['username'];
-                        $_SESSION['role'] = $user['role'];
+                    if ($user) {                        $_SESSION['user_id'] = $user['id'];
+                        $_SESSION['username'] = $user['nombre_usuario'];
+                        $_SESSION['role'] = $user['rol'];
                         
                         // Redirect based on role
-                        $redirect = ($user['role'] === 'admin') ? '?controller=admin&action=dashboard' :
-                                    (($user['role'] === 'agent') ? '?controller=agent&action=dashboard' : '?controller=user&action=dashboard');
+                        $role = strtolower(trim($user['rol']));
+                        $redirect = ($role === 'admin') ? '?controller=admin&action=dashboard' :
+                                    (($role === 'agente') ? '?controller=agent&action=dashboard' : '?controller=user&action=dashboard');
                         header('Location: ' . $redirect);
                         exit;
                     } else {
@@ -67,7 +69,7 @@ class UserController {
                 // Check if user exists using stored procedure
                 $check_params = array($username, $email);
                 $check_params_ref = &$check_params;
-                $check_stmt = sqlsrv_prepare($this->db, "EXEC sp_CheckUserExists @username = ?, @email = ?", $check_params_ref);
+                $check_stmt = sqlsrv_prepare($this->db, "EXEC Usp_Tik_S_VerificarUsuarioExiste @nombre_usuario = ?, @correo = ?", $check_params_ref);
                 if ($check_stmt === false || sqlsrv_execute($check_stmt) === false) {
                     $error = 'Error checking user: ' . print_r(sqlsrv_errors(), true);
                 } else {
@@ -79,7 +81,7 @@ class UserController {
                         // Create user using stored procedure
                         $params = array($username, $email, $password, $role, $department_id);
                         $params_ref = &$params;
-                        $stmt = sqlsrv_prepare($this->db, "EXEC sp_CreateUser @username = ?, @email = ?, @password = ?, @role = ?, @department_id = ?", $params_ref);
+                        $stmt = sqlsrv_prepare($this->db, "EXEC Usp_Tik_U_Usuario @nombre_usuario = ?, @correo = ?, @contrasena = ?, @rol = ?, @departamento_id = ?", $params_ref);
                         if ($stmt === false || sqlsrv_execute($stmt) === false) {
                             $error = 'Error al registrar: ' . print_r(sqlsrv_errors(), true);
                         } else {
@@ -110,17 +112,16 @@ class UserController {
         
         $role = $_SESSION['role'];
         $userId = $_SESSION['user_id'];
+        $tickets = array();
+        $recentUpdates = array();
         
         // Load user-specific data (e.g., tickets for user)
         if ($role === 'user') {
             // Get user's tickets using stored procedure
             $params = array($userId);
             $params_ref = &$params;
-            $stmt = sqlsrv_prepare($this->db, "EXEC sp_GetUserTickets @user_id = ?", $params_ref);
-            if ($stmt === false || sqlsrv_execute($stmt) === false) {
-                $tickets = array();
-            } else {
-                $tickets = array();
+            $stmt = sqlsrv_prepare($this->db, "EXEC Usp_Tik_S_ObtenerTicketsUsuario @usuario_id = ?", $params_ref);
+            if ($stmt !== false && sqlsrv_execute($stmt) !== false) {
                 while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
                     $tickets[] = $row;
                 }
@@ -132,6 +133,7 @@ class UserController {
             $recentUpdates = $ticketModel->getRecentTicketUpdates($userId, 5);
         } // For agent/admin, handle in their controllers
         
+        // Pass data to the view
         include '../app/views/user/dashboard.php';
     }
     

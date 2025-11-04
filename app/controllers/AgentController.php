@@ -6,7 +6,7 @@ class AgentController {
     private $model;
     
     public function __construct() {
-        if ($_SESSION['role'] !== 'agent') {
+        if ($_SESSION['role'] !== 'agente') {
             header('Location: ?controller=user&action=dashboard');
             exit;
         }
@@ -23,12 +23,12 @@ class AgentController {
         // Get agent's department_id using stored procedure
         $dept_params = array($agent_id);
         $dept_params_ref = &$dept_params;
-        $dept_stmt = sqlsrv_prepare($db, "EXEC sp_GetAgentDepartment @agent_id = ?", $dept_params_ref);
+        $dept_stmt = sqlsrv_prepare($db, "EXEC Usp_Tik_S_ObtenerDepartamentoAgente @agente_id = ?", $dept_params_ref);
         if ($dept_stmt === false || sqlsrv_execute($dept_stmt) === false) {
             $department_id = null;
         } else {
             $dept_row = sqlsrv_fetch_array($dept_stmt, SQLSRV_FETCH_ASSOC);
-            $department_id = $dept_row['department_id'];
+            $department_id = $dept_row['departamento_id'];
             sqlsrv_free_stmt($dept_stmt);
         }
         
@@ -36,7 +36,7 @@ class AgentController {
         if ($department_id) {
             $dept_params = array($department_id);
             $dept_params_ref = &$dept_params;
-            $dept_stmt = sqlsrv_prepare($db, "EXEC sp_GetAgentDepartmentTickets @department_id = ?", $dept_params_ref);
+            $dept_stmt = sqlsrv_prepare($db, "EXEC Usp_Tik_S_ObtenerTicketsDepartamentoAgente @departamento_id = ?", $dept_params_ref);
             if ($dept_stmt !== false && sqlsrv_execute($dept_stmt) !== false) {
                 while ($row = sqlsrv_fetch_array($dept_stmt, SQLSRV_FETCH_ASSOC)) {
                     $tickets[] = $row;
@@ -48,7 +48,7 @@ class AgentController {
         // Get tickets specifically assigned to this agent (regardless of department)
         $agent_params = array($agent_id);
         $agent_params_ref = &$agent_params;
-        $agent_stmt = sqlsrv_prepare($db, "EXEC sp_GetAgentTickets @agent_id = ?", $agent_params_ref);
+        $agent_stmt = sqlsrv_prepare($db, "EXEC Usp_Tik_S_ObtenerTicketsAgente @agente_id = ?", $agent_params_ref);
         if ($agent_stmt !== false && sqlsrv_execute($agent_stmt) !== false) {
             while ($row = sqlsrv_fetch_array($agent_stmt, SQLSRV_FETCH_ASSOC)) {
                 $tickets[] = $row;

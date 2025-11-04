@@ -41,25 +41,7 @@
             <p>El tiempo promedio de resolución para tickets resueltos es de <?php echo $avgResolutionTime; ?> días.</p>
         </div>
         
-        <div class="section">
-            <h3>Tickets por Categoría</h3>
-            <table class="report-table">
-                <thead>
-                    <tr>
-                        <th>Categoría</th>
-                        <th>Cantidad</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($ticketsPerCategory as $item): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($item['category']); ?></td>
-                            <td><?php echo $item['count']; ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
+        <!-- Categorías eliminadas del sistema -->
         
         <div class="section">
             <h3>Tickets por Agente</h3>
@@ -73,8 +55,8 @@
                 <tbody>
                     <?php foreach ($ticketsPerAgent as $item): ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($item['agent']); ?></td>
-                            <td><?php echo $item['count']; ?></td>
+                            <td><?php echo htmlspecialchars($item['agente']); ?></td>
+                            <td><?php echo $item['cantidad']; ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -93,8 +75,8 @@
                 <tbody>
                     <?php foreach ($ticketsPerDepartment as $item): ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($item['department']); ?></td>
-                            <td><?php echo $item['count']; ?></td>
+                            <td><?php echo htmlspecialchars($item['departamento']); ?></td>
+                            <td><?php echo $item['cantidad']; ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -106,5 +88,18 @@
             <canvas id="statusChart" width="600" height="300"></canvas>
         </div>
     </div>
+    
+    <script src="js/admin-dashboard.js"></script>
+    <script>
+        // Chart data for admin dashboard
+        window.onload = function() {
+            var statuses = <?php echo json_encode(array_column($ticketsByStatus, 'estado')); ?>;
+            var counts = <?php echo json_encode(array_column($ticketsByStatus, 'cantidad')); ?>;
+            
+            if (typeof createChart === 'function') {
+                createChart(statuses, counts);
+            }
+        };
+    </script>
 </body>
 </html>
